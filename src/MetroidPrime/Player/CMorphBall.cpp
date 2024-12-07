@@ -8,7 +8,8 @@ CMorphBall::CMorphBall(CPlayer& player, float radius)
 , x28_tireMode()
 , x2c_tireLeanAngle()
 , x30_ballTiltAngle()
-, x38_collisionSphere(CCollidableSphere(CSphere(CVector3f::Zero(), radius), CMaterialList(kMT_Solid)))
+, x38_collisionSphere(
+      CCollidableSphere(CSphere(CVector3f::Zero(), radius), CMaterialList(kMT_Solid)))
 , x5c_ballModelShader()
 , x64_spiderBallGlassModelShader()
 , x6c_lowPolyBallModelShader()
@@ -59,3 +60,5 @@ CMorphBall::CMorphBall(CPlayer& player, float radius)
 , x1e44_damageEffect()
 , x1e48_damageEffectDecaySpeed()
 , x1e4c_damageTime() {}
+
+CMorphBall::~CMorphBall() {}
