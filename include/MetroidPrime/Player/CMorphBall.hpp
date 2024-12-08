@@ -59,7 +59,9 @@ public:
   bool IsProjectile() const { return x1954_isProjectile; }
   // LeaveMorphBallState__10CMorphBallFR13CStateManager global
   // LeaveBoosting__10CMorphBallFv global
+  void LeaveBoosting();
   // CancelBoosting__10CMorphBallFv global
+  void CancelBoosting();
   // InSpiderMode__10CMorphBallCFv weak
   // SetAsProjectile__10CMorphBallFRC11CDamageInfoRC11CDamageInfo global
   // CollidedWith__10CMorphBallFRC9TUniqueIdRC18CCollisionInfoListR13CStateManager global
@@ -105,8 +107,8 @@ public:
   // GetWallBumpCounter__10CMorphBallCFv weak
   // GetBallContactMaterials__10CMorphBallCFv weak
   void ComputeBallMovement(const CFinalInput&, CStateManager&, float);
-  void ComputeBoostBallMovement(const CFinalInput&, CStateManager&, float);
-  // IsMovementAllowed__10CMorphBallCFv global
+  void ComputeBoostBallMovement(const CFinalInput&, const CStateManager&, float);
+  bool IsMovementAllowed() const;
   // EnterBoosting__10CMorphBallFv global
   // SwitchToTire__10CMorphBallFv global
   void ComputeMarioMovement(const CFinalInput&, CStateManager&, float);

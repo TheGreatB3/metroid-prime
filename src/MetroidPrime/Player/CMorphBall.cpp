@@ -1,5 +1,6 @@
 #include "MetroidPrime/Player/CMorphBall.hpp"
 
+#include <MetroidPrime/CControlMapper.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
 
@@ -73,4 +74,38 @@ float CMorphBall::GetBallTouchRadius() const { return gpTweakBall->GetBallTouchR
 void CMorphBall::ComputeBallMovement(const CFinalInput& input, CStateManager& mgr, float dt) {
   ComputeBoostBallMovement(input, mgr, dt);
   ComputeMarioMovement(input, mgr, dt);
+}
+
+// NON_MATCHING
+void CMorphBall::ComputeBoostBallMovement(const CFinalInput& input, const CStateManager& mgr,
+                                          float dt) {
+  if (!IsMovementAllowed())
+    return;
+
+  bool hasPowerUp = mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_BoostBall);
+
+  CancelBoosting();
+  LeaveBoosting();
+
+  float fwd = ControlMapper::GetAnalogInput(ControlMapper::kC_Forward, input);
+}
+
+// NON_MATCHING
+bool CMorphBall::IsMovementAllowed() const {
+  if (!gpTweakPlayer->GetMoveDuringFreeLook() && x0_player.IsInFreeLook())
+    return false;
+  if (x0_player.IsMorphBallTransitioning())
+    return false;
+
+  return true;
+}
+
+// NON_MATCHING
+void CMorphBall::ComputeMarioMovement(const CFinalInput& input, CStateManager& mgr, float dt) {
+  if (!IsMovementAllowed())
+    return;
+
+  float fwd = ControlMapper::GetAnalogInput(ControlMapper::kC_Forward, input);
+
+  bool hasPowerUp = mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_MorphBall);
 }
