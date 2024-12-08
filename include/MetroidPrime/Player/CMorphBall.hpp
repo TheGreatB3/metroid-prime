@@ -105,11 +105,11 @@ public:
   // GetWallBumpCounter__10CMorphBallCFv weak
   // GetBallContactMaterials__10CMorphBallCFv weak
   void ComputeBallMovement(const CFinalInput&, CStateManager&, float);
-  // ComputeBoostBallMovement__10CMorphBallFRC11CFinalInputRC13CStateManagerf global
+  void ComputeBoostBallMovement(const CFinalInput&, CStateManager&, float);
   // IsMovementAllowed__10CMorphBallCFv global
   // EnterBoosting__10CMorphBallFv global
   // SwitchToTire__10CMorphBallFv global
-  // ComputeMarioMovement__10CMorphBallFRC11CFinalInputR13CStateManagerf global
+  void ComputeMarioMovement(const CFinalInput&, CStateManager&, float);
   // SetSpiderBallState__10CMorphBallFQ210CMorphBall16ESpiderBallState weak
   // UpdateSpiderBall__10CMorphBallFRC11CFinalInputR13CStateManagerf global
   // CheckForSwitchToSpiderBallSwinging__10CMorphBallCFR13CStateManager global

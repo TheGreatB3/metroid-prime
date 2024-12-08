@@ -69,3 +69,8 @@ CMorphBall::~CMorphBall() {}
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
 
 float CMorphBall::GetBallTouchRadius() const { return gpTweakBall->GetBallTouchRadius(); }
+
+void CMorphBall::ComputeBallMovement(const CFinalInput& input, CStateManager& mgr, float dt) {
+  ComputeBoostBallMovement(input, mgr, dt);
+  ComputeMarioMovement(input, mgr, dt);
+}
