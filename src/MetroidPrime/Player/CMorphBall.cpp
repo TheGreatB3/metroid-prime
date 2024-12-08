@@ -1,5 +1,6 @@
 #include "MetroidPrime/Player/CMorphBall.hpp"
 
+#include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
 
 CMorphBall::CMorphBall(CPlayer& player, float radius)
@@ -66,3 +67,5 @@ CMorphBall::CMorphBall(CPlayer& player, float radius)
 CMorphBall::~CMorphBall() {}
 
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
+
+float CMorphBall::GetBallTouchRadius() const { return gpTweakBall->GetBallTouchRadius(); }
