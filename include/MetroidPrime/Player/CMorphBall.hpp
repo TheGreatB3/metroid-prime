@@ -125,6 +125,7 @@ public:
   // ApplySpiderBallRollForces__10CMorphBallFRC11CFinalInputR13CStateManagerf global
   // CalculateSpiderBallAttractionSurfaceForces__10CMorphBallCFRC11CFinalInputR13CStateManagerRC12CTransform4f global
   // ForwardInput__10CMorphBallCFRC11CFinalInput global
+  float ForwardInput(const CFinalInput&) const;
   // BallTurnInput__10CMorphBallCFRC11CFinalInput global
   // ComputeMaxSpeed__10CMorphBallCFv global
   bool GetIsInHalfPipeModeInAir() const;
@@ -282,6 +283,8 @@ private:
   float x1e48_damageEffectDecaySpeed;
   float x1e4c_damageTime;
   rstl::single_ptr< CMorphBallShadow > x1e50_shadow;
+
+  static float stored_input; // Not sure if this is right.
 };
 CHECK_SIZEOF(CMorphBall, 0x1e58);
 

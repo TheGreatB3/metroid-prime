@@ -4,6 +4,8 @@
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
 
+float CMorphBall::stored_input = 0.0f;
+
 CMorphBall::CMorphBall(CPlayer& player, float radius)
 : x0_player(player)
 , x4_loadedModelId()
@@ -108,4 +110,14 @@ void CMorphBall::ComputeMarioMovement(const CFinalInput& input, CStateManager& m
   float fwd = ControlMapper::GetAnalogInput(ControlMapper::kC_Forward, input);
 
   bool hasPowerUp = mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_MorphBall);
+}
+
+// NON_MATCHING
+float CMorphBall::ForwardInput(const CFinalInput& input) const {
+  if (!IsMovementAllowed())
+    return stored_input; // Not matching here. Loading something from lbl_805AAE70.
+  float forward = ControlMapper::GetAnalogInput(ControlMapper::kC_Forward, input);
+  float backward = ControlMapper::GetAnalogInput(ControlMapper::kC_Backward, input);
+  float movement = forward - backward;
+  return movement;
 }
