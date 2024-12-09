@@ -124,9 +124,8 @@ public:
   // GetSpiderBallSwingControllerMovementScalar__10CMorphBallCFv global
   // ApplySpiderBallRollForces__10CMorphBallFRC11CFinalInputR13CStateManagerf global
   // CalculateSpiderBallAttractionSurfaceForces__10CMorphBallCFRC11CFinalInputR13CStateManagerRC12CTransform4f global
-  // ForwardInput__10CMorphBallCFRC11CFinalInput global
   float ForwardInput(const CFinalInput&) const;
-  // BallTurnInput__10CMorphBallCFRC11CFinalInput global
+  float BallTurnInput(const CFinalInput&) const;
   // ComputeMaxSpeed__10CMorphBallCFv global
   bool GetIsInHalfPipeModeInAir() const;
   // GetTouchedHalfPipeRecently__10CMorphBallCFv global

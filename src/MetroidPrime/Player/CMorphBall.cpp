@@ -121,3 +121,13 @@ float CMorphBall::ForwardInput(const CFinalInput& input) const {
   float movement = forward - backward;
   return movement;
 }
+
+// NON_MATCHING
+float CMorphBall::BallTurnInput(const CFinalInput& input) const {
+  if (!IsMovementAllowed())
+    return stored_input; // Not matching here. Loading something from lbl_805AAE70.
+  float left = ControlMapper::GetAnalogInput(ControlMapper::kC_TurnLeft, input);
+  float right = ControlMapper::GetAnalogInput(ControlMapper::kC_TurnRight, input);
+  float movement = left - right;
+  return movement;
+}
