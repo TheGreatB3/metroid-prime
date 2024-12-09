@@ -282,8 +282,6 @@ private:
   float x1e48_damageEffectDecaySpeed;
   float x1e4c_damageTime;
   rstl::single_ptr< CMorphBallShadow > x1e50_shadow;
-
-  static float stored_input; // Not sure if this is right.
 };
 CHECK_SIZEOF(CMorphBall, 0x1e58);
 
