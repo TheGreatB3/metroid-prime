@@ -109,9 +109,11 @@ void CMorphBall::ComputeBoostBallMovement(const CFinalInput& input, const CState
 
 // NON_MATCHING
 bool CMorphBall::IsMovementAllowed() const {
-  if (!gpTweakPlayer->GetMoveDuringFreeLook() && x0_player.IsInFreeLook())
+  if (!gpTweakPlayer->GetMoveDuringFreeLook() &&
+      (x0_player.IsInFreeLook() || x0_player.GetFreeLookButtonState()))
     return false;
-  if (x0_player.IsMorphBallTransitioning())
+
+  if (x0_player.IsMorphBallTransitioning() || x1e00_disableControlCooldown <= 0.0f)
     return false;
 
   return true;
