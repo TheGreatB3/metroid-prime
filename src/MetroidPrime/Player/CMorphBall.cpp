@@ -1,5 +1,6 @@
 #include "MetroidPrime/Player/CMorphBall.hpp"
 
+#include <Kyoto/CResFactory.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
@@ -70,6 +71,15 @@ CMorphBall::~CMorphBall() {}
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
 
 float CMorphBall::GetBallTouchRadius() const { return gpTweakBall->GetBallTouchRadius(); }
+
+// NON_MATCHING
+void CMorphBall::GetMorphBallModel(const rstl::string& name, float scale) {
+  const SObjectTag* rid = gpResourceFactory->GetResourceIdByName(name.data());
+  CStaticRes static_res(rid->mId, CVector3f(scale, scale, scale) * 0.5f);
+  CModelData model_data(static_res);
+  CAnimRes anim_res(0, CAnimRes::kDefaultCharIdx, CVector3f(scale, scale, scale) * 0.5f, 0, false);
+  CModelData anim_model_data(anim_res);
+}
 
 void CMorphBall::ComputeBallMovement(const CFinalInput& input, CStateManager& mgr, float dt) {
   ComputeBoostBallMovement(input, mgr, dt);

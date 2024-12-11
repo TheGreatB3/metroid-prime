@@ -100,7 +100,7 @@ public:
   // ResetMorphBallTransitionFlash__10CMorphBallFv global
   // CreateSpiderBallParticles__10CMorphBallFRC9CVector3fRC9CVector3f global
   ESpiderBallState GetSpiderBallState() const { return x187c_spiderBallState; }
-  // GetMorphBallModel__10CMorphBallFRCQ24rstl66basic_string<c,Q24rstl14char_traits<c>,Q24rstl17rmemory_allocator>f global
+  void GetMorphBallModel(const rstl::string&, float);
   // LoadAnimationTokens__10CMorphBallFRCQ24rstl66basic_string<c,Q24rstl14char_traits<c>,Q24rstl17rmemory_allocator> global
   // IsBoosting__10CMorphBallCFv weak
   // GetBoostChargeTimer__10CMorphBallCFv weak
