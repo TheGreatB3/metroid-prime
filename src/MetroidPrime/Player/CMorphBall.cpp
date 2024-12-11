@@ -73,12 +73,19 @@ float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHal
 float CMorphBall::GetBallTouchRadius() const { return gpTweakBall->GetBallTouchRadius(); }
 
 // NON_MATCHING
-void CMorphBall::GetMorphBallModel(const rstl::string& name, float scale) {
+CModelData* CMorphBall::GetMorphBallModel(const rstl::string& name, float radius) {
   const SObjectTag* rid = gpResourceFactory->GetResourceIdByName(name.data());
-  CStaticRes static_res(rid->mId, CVector3f(scale, scale, scale) * 0.5f);
-  CModelData model_data(static_res);
-  CAnimRes anim_res(0, CAnimRes::kDefaultCharIdx, CVector3f(scale, scale, scale) * 0.5f, 0, false);
-  CModelData anim_model_data(anim_res);
+
+  if (name.data()[0] == 'C') { // Needs to check if it equals "CMDL".
+    // Load static model.
+    CStaticRes static_res(rid->mId, CVector3f(radius, radius, radius) * 2.0f);
+    return new CModelData(static_res);
+  }
+
+  // Load animation.
+  CAnimRes anim_res(0, CAnimRes::kDefaultCharIdx, CVector3f(radius, radius, radius) * 2.0f, 0,
+                    false);
+  return new CModelData(anim_res);
 }
 
 void CMorphBall::ComputeBallMovement(const CFinalInput& input, CStateManager& mgr, float dt) {
