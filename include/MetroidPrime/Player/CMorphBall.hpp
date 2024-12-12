@@ -50,6 +50,7 @@ public:
   void SetBombJumpState(EBombJumpState state);
   void LoadMorphBallModel(CStateManager& mgr);
   void Update(float dt, CStateManager& mgr);
+  void UpdateMorphBallSound(float dt);
   void StopSounds();
   void UpdateEffects(float dt, CStateManager& mgr);
   void SetBallLightActive(CStateManager& mgr, const bool active);
@@ -98,7 +99,7 @@ public:
   // SetIsInHalfPipeModeInAir__10CMorphBallFb global
   // SetTouchedHalfPipeRecently__10CMorphBallFb global
   // ResetMorphBallTransitionFlash__10CMorphBallFv global
-  // CreateSpiderBallParticles__10CMorphBallFRC9CVector3fRC9CVector3f global
+  void CreateSpiderBallParticles(const CVector3f&, const CVector3f&);
   ESpiderBallState GetSpiderBallState() const { return x187c_spiderBallState; }
   static CModelData* GetMorphBallModel(const rstl::string&, float);
   // LoadAnimationTokens__10CMorphBallFRCQ24rstl66basic_string<c,Q24rstl14char_traits<c>,Q24rstl17rmemory_allocator> global

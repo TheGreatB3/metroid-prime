@@ -4,6 +4,7 @@
 #include <Kyoto/CResFactory.hpp>
 #include <MetroidPrime/CAnimData.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
+#include <MetroidPrime/CRainSplashGenerator.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
 
@@ -69,6 +70,49 @@ CMorphBall::CMorphBall(CPlayer& player, float radius)
 , x1e4c_damageTime() {}
 
 CMorphBall::~CMorphBall() {}
+
+// NON_MATCHING
+void CMorphBall::Update(float dt, CStateManager& mgr) {
+  if (GetSpiderBallState() == kSBS_Active) {
+    CTransform4f ball_to_world = GetBallToWorld();
+    CreateSpiderBallParticles(ball_to_world.GetTranslation(), x1890_spiderTrackPoint);
+  }
+
+  if (x0_player.IsPlayerDeadEnough()) {
+    UpdateEffects(dt, mgr);
+  }
+
+  if (x1e44_damageEffect > 0.0) {
+    x1e44_damageEffect = -x1e48_damageEffectDecaySpeed * dt - x1e44_damageEffect;
+
+    if (x1e44_damageEffect > 0.0) {
+      x1e4c_damageTime += dt;
+    } else {
+      x1e44_damageEffect = 0;
+      x1e48_damageEffectDecaySpeed = 0;
+      x1e4c_damageTime = 0;
+    }
+  }
+
+  x58_ballModel->AdvanceAnimation(dt, mgr, kInvalidAreaId, true);
+
+  if (x1c2c_tireInterpolating) {
+    x1c20_tireFactor += x1c28_tireInterpSpeed * dt;
+    if (x1c20_tireFactor >= 0.0f) {
+      if (x1c20_tireFactor > x1c24_maxTireFactor) {
+        x1c2c_tireInterpolating = false;
+        x1c20_tireFactor = x1c24_maxTireFactor;
+      }
+    } else {
+      x1c2c_tireInterpolating = false;
+      x1c20_tireFactor = 0.0f;
+    }
+  }
+
+  x1c1c_rainSplashGen->Update(dt, mgr);
+
+  UpdateMorphBallSound(dt);
+}
 
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
 
@@ -151,7 +195,6 @@ void CMorphBall::ComputeBoostBallMovement(const CFinalInput& input, const CState
         }
       }
     } else {
-
     }
   }
 
