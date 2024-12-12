@@ -1,6 +1,8 @@
 #include "MetroidPrime/Player/CMorphBall.hpp"
 
+#include <Kyoto/Audio/CSfxManager.hpp>
 #include <Kyoto/CResFactory.hpp>
+#include <MetroidPrime/CAnimData.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
@@ -96,13 +98,62 @@ void CMorphBall::ComputeBallMovement(const CFinalInput& input, CStateManager& mg
 // NON_MATCHING
 void CMorphBall::ComputeBoostBallMovement(const CFinalInput& input, const CStateManager& mgr,
                                           float dt) {
-  if (!IsMovementAllowed())
+  if (!IsMovementAllowed() || mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_BoostBall))
     return;
 
-  bool hasPowerUp = mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_BoostBall);
+  if (!IsBoosting()) {
+    CancelBoosting();
+    LeaveBoosting();
+  } else if (!IsBoosting() && !x1de4_25_boostEnabled) {
+    if (gpTweakBall->GetBoostBallDrainTime() < x1df4_boostDrainTime) {
+      LeaveBoosting();
+    }
 
-  CancelBoosting();
-  LeaveBoosting();
+    if (!GetIsInHalfPipeMode() && !GetIsInHalfPipeModeInAir()) {
+      if (x1df4_boostDrainTime / gpTweakBall->GetBoostBallDrainTime() < 0.3) {
+        DampLinearAndAngularVelocities(0.5, 0.01);
+      }
+      LeaveBoosting();
+    }
+  } else {
+    x1dec_timeNotInBoost += dt;
+    bool jump_or_boost = ControlMapper::GetDigitalInput(ControlMapper::kC_JumpOrBoost, input);
+    if (!jump_or_boost || GetSpiderBallState() == kSBS_Active) {
+      if (x1e20_ballAnimIdx == 1) {
+        CAnimPlaybackParms playback_parms(0, -1, 1.0, true);
+        x58_ballModel->AnimationData()->SetAnimation(playback_parms, false);
+        x1e20_ballAnimIdx = 0;
+        CSfxManager::RemoveEmitter(x1e24_boostSfxHandle);
+
+        if (gpTweakBall->GetBoostBallMaxChargeTime() <= x1de8_boostChargeTime) {
+          CSfxHandle sfx_handle;
+          // CSfxManager::AddEmitter(sfx_handle.GetIndex());
+        }
+      }
+
+      if (x1de8_boostChargeTime < gpTweakBall->GetBoostBallMaxChargeTime()) {
+        if (x1de8_boostChargeTime > 0.0f) {
+          CancelBoosting();
+        }
+      } else {
+        EBallBoostState ball_boost_state = GetBallBoostState();
+        if (ball_boost_state == kBBS_BoostAvailable) {
+          if (GetIsInHalfPipeMode() || GetIsInHalfPipeModeInAir()) {
+            EnterBoosting(dt);
+          } else {
+            CAxisAngle angular_impulse;
+            angular_impulse.FromVector(-x1924_surfaceToWorld.GetUp() * 10000.0);
+            x0_player.ApplyImpulseWR(CVector3f::Zero(), angular_impulse);
+            CancelBoosting();
+          }
+        } else if (ball_boost_state == kBBS_BoostDisabled) {
+          CTransform4f ball_to_world = GetBallToWorld();
+        }
+      }
+    } else {
+
+    }
+  }
 
   float fwd = ControlMapper::GetAnalogInput(ControlMapper::kC_Forward, input);
 }

@@ -67,7 +67,7 @@ public:
   // CollidedWith__10CMorphBallFRC9TUniqueIdRC18CCollisionInfoListR13CStateManager global
   // SwitchToMarble__10CMorphBallFv global
   bool GetIsInHalfPipeMode() const;
-  // DampLinearAndAngularVelocities__10CMorphBallFff global
+  void DampLinearAndAngularVelocities(float, float);
   // IsClimbable__10CMorphBallCFRC14CCollisionInfo global
   void FluidFXThink(CActor::EFluidState state, CScriptWater& water, CStateManager& mgr);
   // GetCollidableSphere__10CMorphBallCFv weak
@@ -102,14 +102,14 @@ public:
   ESpiderBallState GetSpiderBallState() const { return x187c_spiderBallState; }
   static CModelData* GetMorphBallModel(const rstl::string&, float);
   // LoadAnimationTokens__10CMorphBallFRCQ24rstl66basic_string<c,Q24rstl14char_traits<c>,Q24rstl17rmemory_allocator> global
-  // IsBoosting__10CMorphBallCFv weak
+  bool IsBoosting() const { return x1de4_24_inBoost; }
   // GetBoostChargeTimer__10CMorphBallCFv weak
   // GetWallBumpCounter__10CMorphBallCFv weak
   // GetBallContactMaterials__10CMorphBallCFv weak
   void ComputeBallMovement(const CFinalInput&, CStateManager&, float);
   void ComputeBoostBallMovement(const CFinalInput&, const CStateManager&, float);
   bool IsMovementAllowed() const;
-  // EnterBoosting__10CMorphBallFv global
+  void EnterBoosting(float);
   // SwitchToTire__10CMorphBallFv global
   void ComputeMarioMovement(const CFinalInput&, CStateManager&, float);
   // SetSpiderBallState__10CMorphBallFQ210CMorphBall16ESpiderBallState weak
