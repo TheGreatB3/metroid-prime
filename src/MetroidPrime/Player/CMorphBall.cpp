@@ -148,6 +148,23 @@ void CMorphBall::Update(float dt, CStateManager& mgr) {
 
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
 
+// NON_MATCHING
+bool CMorphBall::IsInFrustum(const CFrustumPlanes& frustum) const {
+  if (x58_ballModel->IsNull())
+    return false;
+
+  rstl::optional_object< CAABox > bounds = x19b8_slowBlueTailSwooshGen->GetBounds();
+
+  if (x58_ballModel->IsInFrustum(GetBallToWorld(), frustum))
+    return true;
+
+  if (x19b8_slowBlueTailSwooshGen->GetModulationColor().GetAlpha() != 0.0f &&
+    bounds.valid() && frustum.BoxFrustumPlanesCheck(bounds.data()) != 0)
+    return true;
+
+  return false;
+}
+
 float CMorphBall::GetBallTouchRadius() const { return gpTweakBall->GetBallTouchRadius(); }
 
 // NON_MATCHING

@@ -95,6 +95,7 @@ public:
   CAABox GetBounds() const;
   bool IsLoaded(int shaderIdx) const;
   bool IsDefinitelyOpaque(EWhichModel which) const;
+  bool IsInFrustum(const CTransform4f& transform, const CFrustumPlanes& frustum) const;
 
   CTransform4f GetLocatorTransform(const rstl::string& name) const;
   CTransform4f GetScaledLocatorTransform(const rstl::string& name) const;
