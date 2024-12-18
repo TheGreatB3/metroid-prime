@@ -229,6 +229,7 @@ private:
   rstl::single_ptr< CElementGen > x19d8_boostBallGlowGen;
   rstl::single_ptr< CElementGen > x19dc_morphBallTransitionFlashGen;
   rstl::single_ptr< CElementGen > x19e0_effect_morphBallIceBreakGen;
+  // Seems like this should have 32 elements, but that makes the structure size wrong.
   rstl::reserved_vector< rstl::pair< rstl::single_ptr< CParticleSwoosh >, bool >, 48 >
       x19e4_spiderElectricGens;
   rstl::list< CSpiderBallElectricityManager > x1b68_activeSpiderElectricList;
@@ -283,6 +284,8 @@ private:
   float x1e48_damageEffectDecaySpeed;
   float x1e4c_damageTime;
   rstl::single_ptr< CMorphBallShadow > x1e50_shadow;
+
+  static float kSpiderBallCollisionRadius;
 };
 CHECK_SIZEOF(CMorphBall, 0x1e58);
 

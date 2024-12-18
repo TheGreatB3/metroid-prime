@@ -2,17 +2,24 @@
 
 #include <Kyoto/Audio/CSfxManager.hpp>
 #include <Kyoto/CResFactory.hpp>
+#include <Kyoto/Particles/CElementGen.hpp>
+#include <Kyoto/Particles/CParticleSwoosh.hpp>
+#include <MetroidPrime/CActorLights.hpp>
 #include <MetroidPrime/CAnimData.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
 #include <MetroidPrime/CRainSplashGenerator.hpp>
+#include <MetroidPrime/CWorldShadow.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
 
+// NON_MATCHING
 CMorphBall::CMorphBall(CPlayer& player, float radius)
 : x0_player(player)
-, x4_loadedModelId()
+, x4_loadedModelId(-1)
 , x8_ballGlowColorIdx()
 , xc_radius(radius)
+, x10_boostControlForce(CVector3f::Zero())
+, x1c_controlForce(CVector3f::Zero())
 , x28_tireMode()
 , x2c_tireLeanAngle()
 , x30_ballTiltAngle()
@@ -22,7 +29,10 @@ CMorphBall::CMorphBall(CPlayer& player, float radius)
 , x64_spiderBallGlassModelShader()
 , x6c_lowPolyBallModelShader()
 , xc78_()
-, x188c_spiderPullMovement()
+, x187c_spiderBallState(kSBS_Inactive)
+, x1880_playerToSpiderNormal(CVector3f::Zero())
+, x188c_spiderPullMovement(1.0)
+, x1890_spiderTrackPoint(CVector3f::Zero())
 , x18b4_linVelDamp()
 , x18b8_angVelDamp()
 , x18bc_spiderNearby()
@@ -46,14 +56,19 @@ CMorphBall::CMorphBall(CPlayer& player, float radius)
 , x1954_isProjectile()
 , x1c0c_wakeEffectIdx()
 , x1c10_ballInnerGlowLight(kInvalidUniqueId)
-, x1c20_tireFactor()
-, x1c24_maxTireFactor()
-, x1c28_tireInterpSpeed()
-, x1c2c_tireInterpolating()
+, x1c14_worldShadow(new CWorldShadow(16, 16, false))
+, x1c18_actorLights(new CActorLights(8, CVector3f::Zero(), 4, 4))
+, x1c1c_rainSplashGen(new CRainSplashGenerator(x58_ballModel->GetScale(), 40, 2, 0.15, 0.5))
+, x1c20_tireFactor(0.0f)
+, x1c24_maxTireFactor(0.5f)
+, x1c28_tireInterpSpeed(1.0f)
+, x1c2c_tireInterpolating(false)
 , x1c30_boostOverLightFactor()
 , x1c34_boostLightFactor()
 , x1c38_spiderLightFactor()
 , x1dc8_failsafeCounter()
+, x1dcc_(CVector3f::Zero())
+, x1dd8_(CVector3f::Zero())
 , x1de8_boostChargeTime()
 , x1dec_timeNotInBoost()
 , x1df0_()
@@ -61,13 +76,30 @@ CMorphBall::CMorphBall(CPlayer& player, float radius)
 , x1dfc_touchHalfPipeCooldown()
 , x1e00_disableControlCooldown()
 , x1e04_touchHalfPipeRecentCooldown()
+, x1e08_prevHalfPipeNormal(CVector3f::Zero())
+, x1e14_halfPipeNormal(CVector3f::Zero())
 , x1e20_ballAnimIdx()
 , x1e34_rollSfx()
 , x1e36_landSfx()
 , x1e38_wallSparkFrameCountdown()
 , x1e44_damageEffect()
 , x1e48_damageEffectDecaySpeed()
-, x1e4c_damageTime() {}
+, x1e4c_damageTime() {
+  x19d4_spiderBallMagnetEffectGen->SetParticleEmission(false);
+  x19d4_spiderBallMagnetEffectGen->Update(1.0f / 60.0f);
+
+  kSpiderBallCollisionRadius = GetBallRadius() + 0.2f;
+
+  for (int i = 0; i < 32; i++) {
+    CToken token(x19a0_spiderElectric);
+    rstl::single_ptr< CParticleSwoosh > swoosh(new CParticleSwoosh(token));
+    x19e4_spiderElectricGens.push_back(
+        rstl::pair< rstl::single_ptr< CParticleSwoosh >, bool >(swoosh, false));
+  }
+
+  // LoadAnimationTokens();
+  // InitializeWakeEffects();
+}
 
 CMorphBall::~CMorphBall() {}
 
