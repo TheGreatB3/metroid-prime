@@ -149,6 +149,10 @@ void CMorphBall::Update(float dt, CStateManager& mgr) {
 
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
 
+void CMorphBall::SetAsProjectile() {
+  x1954_isProjectile = true;
+}
+
 // NON_MATCHING
 bool CMorphBall::IsInFrustum(const CFrustumPlanes& frustum) const {
   if (x58_ballModel->IsNull())

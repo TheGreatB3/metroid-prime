@@ -64,7 +64,7 @@ public:
   // CancelBoosting__10CMorphBallFv global
   void CancelBoosting();
   // InSpiderMode__10CMorphBallCFv weak
-  // SetAsProjectile__10CMorphBallFRC11CDamageInfoRC11CDamageInfo global
+  void SetAsProjectile();
   // CollidedWith__10CMorphBallFRC9TUniqueIdRC18CCollisionInfoListR13CStateManager global
   // SwitchToMarble__10CMorphBallFv global
   bool GetIsInHalfPipeMode() const;
