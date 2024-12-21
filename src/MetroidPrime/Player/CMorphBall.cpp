@@ -191,6 +191,13 @@ void CMorphBall::AcceptScriptMsg(EScriptObjectMessage msg, TUniqueId id, CStateM
   }
 }
 
+void CMorphBall::DeleteLight(CStateManager& mgr) {
+  if (x1c10_ballInnerGlowLight != kInvalidUniqueId) {
+    mgr.DeleteObjectRequest(x1c10_ballInnerGlowLight);
+    x1c10_ballInnerGlowLight = kInvalidUniqueId;
+  }
+}
+
 // NON_MATCHING
 CModelData* CMorphBall::GetMorphBallModel(const rstl::string& name, float radius) {
   const SObjectTag* rid = gpResourceFactory->GetResourceIdByName(name.data());
