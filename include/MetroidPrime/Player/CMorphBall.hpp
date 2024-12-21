@@ -87,7 +87,7 @@ public:
   float GetBallTouchRadius() const;
   void Touch(CActor& actor, CStateManager& mgr);
   void AcceptScriptMsg(EScriptObjectMessage, TUniqueId, CStateManager&);
-  // DeleteLight__10CMorphBallFR13CStateManager global
+  void DeleteLight(CStateManager&);
   // EnterMorphBallState__10CMorphBallFR13CStateManager
   // GetSwooshToWorld__10CMorphBallCFv global
   // IsMorphBallTransitionFlashValid__10CMorphBallCFv global

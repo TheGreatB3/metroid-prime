@@ -7,6 +7,7 @@
 #include <MetroidPrime/CActorLights.hpp>
 #include <MetroidPrime/CAnimData.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
+#include <MetroidPrime/CGameLight.hpp>
 #include <MetroidPrime/CRainSplashGenerator.hpp>
 #include <MetroidPrime/CWorldShadow.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
@@ -158,14 +159,37 @@ bool CMorphBall::IsInFrustum(const CFrustumPlanes& frustum) const {
   if (x58_ballModel->IsInFrustum(GetBallToWorld(), frustum))
     return true;
 
-  if (x19b8_slowBlueTailSwooshGen->GetModulationColor().GetAlpha() != 0.0f &&
-    bounds.valid() && frustum.BoxFrustumPlanesCheck(bounds.data()) != 0)
+  if (x19b8_slowBlueTailSwooshGen->GetModulationColor().GetAlpha() != 0.0f && bounds.valid() &&
+      frustum.BoxFrustumPlanesCheck(bounds.data()) != 0)
     return true;
 
   return false;
 }
 
 float CMorphBall::GetBallTouchRadius() const { return gpTweakBall->GetBallTouchRadius(); }
+
+// NON_MATCHING
+void CMorphBall::AcceptScriptMsg(EScriptObjectMessage msg, TUniqueId id, CStateManager& mgr) {
+  switch (msg) {
+  case kSM_Registered: {
+    if (!x19d0_ballInnerGlowGen.null() && x19d0_ballInnerGlowGen->SystemHasLight()) {
+      x1c10_ballInnerGlowLight = mgr.AllocateUniqueId();
+      const uint inner_glow_id = x1988_ballInnerGlow.GetTag().GetId();
+      mgr.AddObject(rs_new CGameLight(x1c10_ballInnerGlowLight, kInvalidAreaId, false,
+                                      rstl::string_l("BallLight"), GetBallToWorld(),
+                                      x0_player.GetUniqueId(), x19d0_ballInnerGlowGen->GetLight(),
+                                      inner_glow_id, 0, 0.0f));
+    }
+  } break;
+
+  case kSM_Deleted:
+    DeleteLight(mgr);
+    break;
+
+  default:
+    break;
+  }
+}
 
 // NON_MATCHING
 CModelData* CMorphBall::GetMorphBallModel(const rstl::string& name, float radius) {
