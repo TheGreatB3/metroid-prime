@@ -147,6 +147,12 @@ void CMorphBall::Update(float dt, CStateManager& mgr) {
   UpdateMorphBallSound(dt);
 }
 
+CTransform4f CMorphBall::GetBallToWorld() const {
+  return CTransform4f(
+      CTransform4f::Translate(x0_player.GetTranslation() + CVector3f(0.0f, 0.0f, GetBallRadius())) *
+      x0_player.GetTransform().GetRotation());
+}
+
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
 
 void CMorphBall::SetAsProjectile() {
