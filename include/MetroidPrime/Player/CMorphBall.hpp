@@ -58,7 +58,6 @@ public:
   float GetBallRadius() const;
   void TakeDamage(float damage);
   bool IsProjectile() const { return x1954_isProjectile; }
-  // LeaveMorphBallState__10CMorphBallFR13CStateManager global
   // LeaveBoosting__10CMorphBallFv global
   void LeaveBoosting();
   // CancelBoosting__10CMorphBallFv global
@@ -87,7 +86,8 @@ public:
   void Touch(CActor& actor, CStateManager& mgr);
   void AcceptScriptMsg(EScriptObjectMessage, TUniqueId, CStateManager&);
   void DeleteLight(CStateManager&);
-  // EnterMorphBallState__10CMorphBallFR13CStateManager
+  void EnterMorphBallState(CStateManager& mgr);
+  void LeaveMorphBallState(CStateManager& mgr);
   // GetSwooshToWorld__10CMorphBallCFv global
   // IsMorphBallTransitionFlashValid__10CMorphBallCFv global
   // AddSpiderBallElectricalEffect__10CMorphBallFv global
@@ -97,7 +97,7 @@ public:
   void SetIsInHalfPipeMode(bool val);
   bool GetIsInHalfPipeModeInAir() const;
   void SetIsInHalfPipeModeInAir(bool val);
-  // DisableHalfPipeStatus__10CMorphBallFv global
+  void DisableHalfPipeStatus();
   // SetTouchedHalfPipeRecently__10CMorphBallFb global
   // ResetMorphBallTransitionFlash__10CMorphBallFv global
   void CreateSpiderBallParticles(const CVector3f&, const CVector3f&);

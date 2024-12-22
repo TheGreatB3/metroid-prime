@@ -209,6 +209,28 @@ void CMorphBall::DeleteLight(CStateManager& mgr) {
   }
 }
 
+void CMorphBall::EnterMorphBallState(CStateManager& mgr) {
+  x1c20_tireFactor = 0.0f;
+  UpdateEffects(0.0f, mgr);
+  x187c_spiderBallState = kSBS_Inactive;
+  x58_ballModel->AnimationData()->SetAnimation(CAnimPlaybackParms(0, -1, 1.0f, true), false);
+  x1e20_ballAnimIdx = 0;
+  StopParticleWakes();
+  x1c30_boostOverLightFactor = 0.0f;
+  x1c34_boostLightFactor = 0.0f;
+  x1c38_spiderLightFactor = 0.0f;
+  DisableHalfPipeStatus();
+  x30_ballTiltAngle = 0.0f;
+  x2c_tireLeanAngle = 0.0f;
+}
+
+void CMorphBall::LeaveMorphBallState(CStateManager& mgr) {
+  LeaveBoosting();
+  CancelBoosting();
+  CSfxManager::SfxStop(x1e24_boostSfxHandle);
+  StopParticleWakes();
+}
+
 bool CMorphBall::GetIsInHalfPipeMode() const { return x1df8_24_inHalfPipeMode; }
 
 void CMorphBall::SetIsInHalfPipeMode(bool val) { x1df8_24_inHalfPipeMode = val; }
