@@ -342,6 +342,7 @@ public:
   void UpdateOrbitTarget(CStateManager& mgr);
   void UpdateOrbitOrientation(CStateManager& mgr);
   bool IsTransparent() const;
+  float GetDeathTime() const { return x9f4_deathTime; }
 
   CPlayerGun* PlayerGun() { return x490_gun.get(); }
   const CPlayerGun* GetPlayerGun() const { return x490_gun.get(); }
