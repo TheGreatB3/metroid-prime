@@ -104,45 +104,48 @@ CMorphBall::CMorphBall(CPlayer& player, float radius)
 
 CMorphBall::~CMorphBall() {}
 
-// NON_MATCHING
 void CMorphBall::Update(float dt, CStateManager& mgr) {
   if (GetSpiderBallState() == kSBS_Active) {
-    CTransform4f ball_to_world = GetBallToWorld();
-    CreateSpiderBallParticles(ball_to_world.GetTranslation(), x1890_spiderTrackPoint);
+    CVector3f position = GetBallToWorld().GetTranslation();
+    CreateSpiderBallParticles(position, x1890_spiderTrackPoint);
   }
 
-  if (x0_player.IsPlayerDeadEnough()) {
+  if (x0_player.GetDeathTime() <= 0.0f) {
     UpdateEffects(dt, mgr);
   }
 
-  if (x1e44_damageEffect > 0.0) {
-    x1e44_damageEffect = -x1e48_damageEffectDecaySpeed * dt - x1e44_damageEffect;
+  if (x1e44_damageEffect > 0.0f) {
+    x1e44_damageEffect -= x1e48_damageEffectDecaySpeed * dt;
 
-    if (x1e44_damageEffect > 0.0) {
-      x1e4c_damageTime += dt;
+    if (x1e44_damageEffect <= 0.0f) {
+      x1e44_damageEffect = 0.0f;
+      x1e48_damageEffectDecaySpeed = 0.0f;
+      x1e4c_damageTime = 0.0f;
     } else {
-      x1e44_damageEffect = 0;
-      x1e48_damageEffectDecaySpeed = 0;
-      x1e4c_damageTime = 0;
+      x1e4c_damageTime += dt;
     }
   }
 
-  x58_ballModel->AdvanceAnimation(dt, mgr, kInvalidAreaId, true);
+  if (!x58_ballModel.null()) {
+    x58_ballModel->AdvanceAnimation(dt, mgr, kInvalidAreaId, true);
+  }
 
   if (x1c2c_tireInterpolating) {
     x1c20_tireFactor += x1c28_tireInterpSpeed * dt;
-    if (x1c20_tireFactor >= 0.0f) {
+    if (x1c20_tireFactor < 0.0f) {
+      x1c2c_tireInterpolating = false;
+      x1c20_tireFactor = 0.0f;
+    } else {
       if (x1c20_tireFactor > x1c24_maxTireFactor) {
         x1c2c_tireInterpolating = false;
         x1c20_tireFactor = x1c24_maxTireFactor;
       }
-    } else {
-      x1c2c_tireInterpolating = false;
-      x1c20_tireFactor = 0.0f;
     }
   }
 
-  x1c1c_rainSplashGen->Update(dt, mgr);
+  if (!x1c1c_rainSplashGen.null()) {
+    x1c1c_rainSplashGen->Update(dt, mgr);
+  }
 
   UpdateMorphBallSound(dt);
 }
@@ -155,9 +158,7 @@ CTransform4f CMorphBall::GetBallToWorld() const {
 
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
 
-void CMorphBall::SetAsProjectile() {
-  x1954_isProjectile = true;
-}
+void CMorphBall::SetAsProjectile() { x1954_isProjectile = true; }
 
 // NON_MATCHING
 bool CMorphBall::IsInFrustum(const CFrustumPlanes& frustum) const {
