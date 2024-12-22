@@ -67,7 +67,6 @@ public:
   void SetAsProjectile();
   // CollidedWith__10CMorphBallFRC9TUniqueIdRC18CCollisionInfoListR13CStateManager global
   // SwitchToMarble__10CMorphBallFv global
-  bool GetIsInHalfPipeMode() const;
   void DampLinearAndAngularVelocities(float, float);
   // IsClimbable__10CMorphBallCFRC14CCollisionInfo global
   void FluidFXThink(CActor::EFluidState state, CScriptWater& water, CStateManager& mgr);
@@ -94,9 +93,11 @@ public:
   // AddSpiderBallElectricalEffect__10CMorphBallFv global
   // UpdateSpiderBallElectricalEffects__10CMorphBallFv global
   // UpdateMorphBallTransitionFlash__10CMorphBallFf global
+  bool GetIsInHalfPipeMode() const;
+  void SetIsInHalfPipeMode(bool val);
+  bool GetIsInHalfPipeModeInAir() const;
+  void SetIsInHalfPipeModeInAir(bool val);
   // DisableHalfPipeStatus__10CMorphBallFv global
-  // SetIsInHalfPipeMode__10CMorphBallFb global
-  // SetIsInHalfPipeModeInAir__10CMorphBallFb global
   // SetTouchedHalfPipeRecently__10CMorphBallFb global
   // ResetMorphBallTransitionFlash__10CMorphBallFv global
   void CreateSpiderBallParticles(const CVector3f&, const CVector3f&);
@@ -128,7 +129,6 @@ public:
   float ForwardInput(const CFinalInput&) const;
   float BallTurnInput(const CFinalInput&) const;
   // ComputeMaxSpeed__10CMorphBallCFv global
-  bool GetIsInHalfPipeModeInAir() const;
   // GetTouchedHalfPipeRecently__10CMorphBallCFv global
   // ComputeLiftForces__10CMorphBallFRC9CVector3fRC9CVector3fRC13CStateManager global
   void UpdateBallDynamics(CStateManager&, float);

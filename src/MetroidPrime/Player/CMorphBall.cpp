@@ -209,6 +209,14 @@ void CMorphBall::DeleteLight(CStateManager& mgr) {
   }
 }
 
+bool CMorphBall::GetIsInHalfPipeMode() const { return x1df8_24_inHalfPipeMode; }
+
+void CMorphBall::SetIsInHalfPipeMode(bool val) { x1df8_24_inHalfPipeMode = val; }
+
+bool CMorphBall::GetIsInHalfPipeModeInAir() const { return x1df8_25_inHalfPipeModeInAir; }
+
+void CMorphBall::SetIsInHalfPipeModeInAir(bool val) { x1df8_25_inHalfPipeModeInAir = val; }
+
 // NON_MATCHING
 CModelData* CMorphBall::GetMorphBallModel(const rstl::string& name, float radius) {
   const SObjectTag* rid = gpResourceFactory->GetResourceIdByName(name.data());
