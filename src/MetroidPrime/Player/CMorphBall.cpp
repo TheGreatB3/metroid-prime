@@ -511,3 +511,45 @@ float CMorphBall::BallTurnInput(const CFinalInput& input) const {
   float movement = left - right;
   return movement;
 }
+
+void CMorphBall::ComputeLiftForces(const CVector3f& control_force, const CVector3f& velocity,
+                                   const CStateManager& mgr) {
+  float speed = velocity.Magnitude();
+  x1cd0_liftSpeedAvg.AddValue(speed);
+
+  x1d10_liftControlForceAvg.AddValue(control_force);
+  CVector3f avg_force = *x1d10_liftControlForceAvg.GetAverage();
+
+  float avg_force_mag = avg_force.Magnitude();
+  if (avg_force_mag > 12000.0f) {
+    float avg_speed = x1cd0_liftSpeedAvg.GetAverage();
+
+    if (avg_speed < 4.0f) {
+      CTransform4f transform = x0_player.GetPrimitiveTransform();
+      const CCollisionPrimitive* prim = x0_player.GetCollisionPrimitive();
+      CAABox aabb = prim->CalculateAABox(transform);
+      CVector3f padding = CVector3f(0.1f, 0.1f, 0.05f);
+      CVector3f min = aabb.GetMinPoint() - padding;
+      CVector3f max = aabb.GetMaxPoint() + padding;
+      CAABox padded = CAABox(min, max);
+      CCollidableAABox aabox(padded, CMaterialList(kMT_NoStepLogic, kMT_NoStepLogic));
+
+      bool collided = CGameCollision::DetectStaticCollisionBoolean(
+          mgr, *prim, transform, CMaterialFilter::GetPassEverything());
+
+      if (collided) {
+        float radius = GetBallRadius();
+        CVector3f pos = transform.GetTranslation() + CVector3f::Up() * (radius * 1.75f);
+        CRayCastResult raycast_result = mgr.RayStaticIntersection(
+            pos, avg_force * (1.0f / avg_force_mag), 1.4f, CMaterialFilter());
+
+        if (raycast_result.IsInvalid()) {
+          x0_player.ApplyForceWR(CVector3f::Zero(), CAxisAngle::Identity());
+          CAxisAngle ang;
+          ang.FromVector(-x1924_surfaceToWorld.GetColumn(kDX) * 1000.0f);
+          x0_player.ApplyImpulseWR(CVector3f::Zero(), ang);
+        }
+      }
+    }
+  }
+}
