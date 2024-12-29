@@ -160,6 +160,25 @@ CTransform4f CMorphBall::GetBallToWorld() const {
 
 float CMorphBall::GetBallRadius() const { return gpTweakPlayer->GetPlayerBallHalfExtent(); }
 
+void CMorphBall::TakeDamage(float damage) {
+  if (damage <= 0.0f) {
+    x1e44_damageEffect = 0.0f;
+    x1e48_damageEffectDecaySpeed = 0.0f;
+    return;
+  }
+
+  if (damage >= 20.0f) {
+    x1e48_damageEffectDecaySpeed = 0.25f;
+  } else {
+    if (damage > 5.0f)
+      x1e48_damageEffectDecaySpeed = -((damage - 5.0f) / 15.0f * 0.75f - 1.0f);
+    else
+      x1e48_damageEffectDecaySpeed = 1.0f;
+  }
+
+  x1e44_damageEffect = 1.0f;
+}
+
 void CMorphBall::SetAsProjectile() { x1954_isProjectile = true; }
 
 // NON_MATCHING
@@ -269,7 +288,7 @@ void CMorphBall::ComputeBallMovement(const CFinalInput& input, CStateManager& mg
 // NON_MATCHING
 void CMorphBall::ComputeBoostBallMovement(const CFinalInput& input, const CStateManager& mgr,
                                           float dt) {
-  if (!IsMovementAllowed() || mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_BoostBall))
+  if (!IsMovementAllowed() || !mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_BoostBall))
     return;
 
   if (!IsBoosting()) {
