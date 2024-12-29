@@ -1,5 +1,6 @@
 #include "MetroidPrime/Player/CMorphBall.hpp"
 
+#include <Collision/CRayCastResult.hpp>
 #include <Kyoto/Audio/CSfxManager.hpp>
 #include <Kyoto/CResFactory.hpp>
 #include <Kyoto/Particles/CElementGen.hpp>
@@ -7,6 +8,7 @@
 #include <MetroidPrime/CActorLights.hpp>
 #include <MetroidPrime/CAnimData.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
+#include <MetroidPrime/CGameCollision.hpp>
 #include <MetroidPrime/CGameLight.hpp>
 #include <MetroidPrime/CRainSplashGenerator.hpp>
 #include <MetroidPrime/CWorldShadow.hpp>
@@ -239,6 +241,10 @@ bool CMorphBall::GetIsInHalfPipeModeInAir() const { return x1df8_25_inHalfPipeMo
 
 void CMorphBall::SetIsInHalfPipeModeInAir(bool val) { x1df8_25_inHalfPipeModeInAir = val; }
 
+bool CMorphBall::GetTouchedHalfPipeRecently() const { return x1df8_26_touchedHalfPipeRecently; }
+
+void CMorphBall::SetTouchedHalfPipeRecently(bool val) { x1df8_26_touchedHalfPipeRecently = val; }
+
 // NON_MATCHING
 CModelData* CMorphBall::GetMorphBallModel(const rstl::string& name, float radius) {
   const SObjectTag* rid = gpResourceFactory->GetResourceIdByName(name.data());
@@ -336,12 +342,154 @@ bool CMorphBall::IsMovementAllowed() const {
 
 // NON_MATCHING
 void CMorphBall::ComputeMarioMovement(const CFinalInput& input, CStateManager& mgr, float dt) {
+  x1c_controlForce = CVector3f::Zero();
+  x10_boostControlForce = CVector3f::Zero();
+
   if (!IsMovementAllowed())
     return;
 
-  float fwd = ControlMapper::GetAnalogInput(ControlMapper::kC_Forward, input);
+  float analog_input = ControlMapper::GetAnalogInput(ControlMapper::kC_SpiderBall, input);
+  x188c_spiderPullMovement = analog_input < 0.5f / 100.0f ? 0.0f : 1.0f;
 
-  bool hasPowerUp = mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_MorphBall);
+  if (mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_SpiderBall) &&
+      x188c_spiderPullMovement != 0.0f && x191c_damageTimer == 0.0f) {
+    if (x187c_spiderBallState != kSBS_Active) {
+      x18bd_touchingSpider = false;
+      x187c_spiderBallState = kSBS_Active;
+      x189c_spiderInterpBetweenPoints = x0_player.GetTransform().GetColumn(kDZ);
+      x18a8_spiderBetweenPoints = x189c_spiderInterpBetweenPoints;
+    }
+
+    UpdateSpiderBall(input, mgr, dt);
+
+    if (x18bc_spiderNearby) {
+      x187c_spiderBallState = kSBS_Inactive;
+      ResetSpiderBallForces();
+    }
+  } else {
+    x187c_spiderBallState = kSBS_Inactive;
+    ResetSpiderBallForces();
+  }
+
+  if (x187c_spiderBallState != kSBS_Active) {
+    float fwd_input = ForwardInput(input);
+    float turn_input = -BallTurnInput(input);
+    float max_speed = ComputeMaxSpeed();
+    float speed = x0_player.GetVelocityWR().Magnitude();
+    CTransform4f look =
+        CTransform4f::LookAt(CVector3f::Zero(), x0_player.GetControlDirFlat(), CVector3f::Up());
+    CVector3f rotated = look.TransposeRotate(x0_player.GetVelocityWR());
+
+    float fwd_acc = 0.0f;
+    float turn_acc = 0.0f;
+
+    float force_x = rotated.GetX();
+    float force_y = rotated.GetY();
+
+    // Process turn input
+    if (CMath::AbsF(turn_input) > 0.1f) {
+      float turn_speed = turn_input * max_speed;
+      float a = turn_speed - force_x;
+      float b = CMath::AbsF(a) / max_speed;
+      float c = CMath::Clamp(0.0f, b, 1.0f);
+
+      float fwd_sign = CMath::Sign(force_x);
+      float turn_sign = CMath::Sign(turn_speed);
+
+      float max_acc =
+          fwd_sign == turn_sign || speed < max_speed * 0.8f
+              ? gpTweakBall->GetMaxBallTranslationAcceleration(x0_player.GetSurfaceRestraint())
+              : gpTweakBall->GetBallForwardBrakingAcceleration(x0_player.GetSurfaceRestraint());
+
+      // turn_acc = (a >= 0.0f ? max_acc : -max_acc) * c;
+      turn_acc = CMath::Sign(a) * max_acc * c;
+    }
+
+    // Process forward input
+    if (CMath::AbsF(fwd_input) > 0.1f) {
+      float fwd_speed = fwd_input * max_speed;
+      float a = fwd_speed - force_y;
+      float b = CMath::AbsF(a) / max_speed;
+      float c = CMath::Clamp(0.0f, b, 1.0f);
+
+      float fwd_sign = CMath::Sign(fwd_speed);
+      float turn_sign = CMath::Sign(force_y);
+
+      float max_acc =
+          fwd_sign == turn_sign || speed <= max_speed * 0.8f
+              ? gpTweakBall->GetMaxBallTranslationAcceleration(x0_player.GetSurfaceRestraint())
+              : gpTweakBall->GetBallForwardBrakingAcceleration(x0_player.GetSurfaceRestraint());
+
+      // fwd_acc = (a >= 0.0f ? max_acc : -max_acc) * c;
+      fwd_acc = CMath::Sign(a) * max_acc * c;
+    }
+
+    if (fwd_acc != 0.0f || turn_acc != 0.0f || x1de4_24_inBoost || GetIsInHalfPipeMode()) {
+      CVector3f va = look.Rotate(CVector3f(0.0f, turn_acc, 0.0f));
+      CVector3f vb = look.Rotate(CVector3f(fwd_acc, 0.0f, 0.0f));
+      CVector3f control_force = va + vb;
+      x1c_controlForce = control_force;
+
+      if (x1de4_24_inBoost && !GetIsInHalfPipeMode()) {
+        CVector3f vc = x1924_surfaceToWorld.TransposeRotate(control_force);
+        control_force = x1924_surfaceToWorld.Rotate(CVector3f(vc.GetX(), 0.0f, 0.0f));
+      }
+
+      if (GetIsInHalfPipeMode() && control_force.Magnitude() > FLT_EPSILON) {
+        if (GetIsInHalfPipeModeInAir() && speed <= 15.0f) {
+          CVector3f surface_to_world_z = x1924_surfaceToWorld.GetColumn(kDZ);
+          if (CVector3f::Dot(surface_to_world_z, control_force) / control_force.Magnitude() <
+              -0.85f) {
+            DisableHalfPipeStatus();
+            x1e00_disableControlCooldown = 0.2f;
+            x0_player.ApplyImpulseWR(x0_player.GetMass() * -7.5f * surface_to_world_z,
+                                     CAxisAngle::Identity());
+          }
+        }
+
+        if (GetIsInHalfPipeMode()) {
+          CVector3f surface_to_world_z = x1924_surfaceToWorld.GetColumn(kDZ);
+          control_force -= CVector3f::Dot(surface_to_world_z, control_force) * surface_to_world_z;
+          CVector3f v = x1924_surfaceToWorld.TransposeRotate(control_force);
+          control_force = x1924_surfaceToWorld.Rotate(
+              CVector3f(v.GetX() * 0.6f, v.GetY() * (x1de4_24_inBoost ? 0.0f : 1.4f), v.GetZ()));
+
+          if (max_speed > 95.0f) {
+            x0_player.SetVelocityWR(x0_player.GetVelocityWR() * 0.99f);
+          }
+        }
+      }
+
+      if (GetTouchedHalfPipeRecently()) {
+        float dotted = CVector3f::Dot(x1e08_prevHalfPipeNormal, x1e14_halfPipeNormal);
+        if (dotted < 0.99f && dotted > 0.5f) {
+          CVector3f crossed =
+              CVector3f::Cross(x1e08_prevHalfPipeNormal, x1e14_halfPipeNormal).AsNormalized();
+          CVector3f velocity = x0_player.GetVelocityWR();
+          velocity -= CVector3f::Dot(crossed, velocity) * crossed * 0.15f;
+          x0_player.SetVelocityWR(velocity);
+        }
+      }
+
+      float scaled_speed = max_speed * 0.75f;
+      if (speed >= scaled_speed) {
+        CVector3f velocity = x0_player.GetVelocityWR();
+        CVector3f v = velocity.AsNormalized();
+        float dotted = CVector3f::Dot(control_force, v);
+        if (dotted > 0.0f) {
+          float x = (speed - scaled_speed) / (max_speed - scaled_speed);
+          x = CMath::Clamp(0.0f, x, 1.0f);
+          CVector3f v2 = velocity.AsNormalized();
+          control_force -= x * dotted * v2;
+        }
+      }
+
+      x10_boostControlForce = control_force;
+      x0_player.ApplyForceWR(control_force, CAxisAngle::Identity());
+    }
+
+    ComputeLiftForces(x1c_controlForce, x0_player.GetVelocityWR(), mgr);
+  }
 }
 
 // NON_MATCHING

@@ -97,8 +97,9 @@ public:
   void SetIsInHalfPipeMode(bool val);
   bool GetIsInHalfPipeModeInAir() const;
   void SetIsInHalfPipeModeInAir(bool val);
+  bool GetTouchedHalfPipeRecently() const;
+  void SetTouchedHalfPipeRecently(bool val);
   void DisableHalfPipeStatus();
-  // SetTouchedHalfPipeRecently__10CMorphBallFb global
   // ResetMorphBallTransitionFlash__10CMorphBallFv global
   void CreateSpiderBallParticles(const CVector3f&, const CVector3f&);
   ESpiderBallState GetSpiderBallState() const { return x187c_spiderBallState; }
@@ -115,7 +116,8 @@ public:
   // SwitchToTire__10CMorphBallFv global
   void ComputeMarioMovement(const CFinalInput&, CStateManager&, float);
   // SetSpiderBallState__10CMorphBallFQ210CMorphBall16ESpiderBallState weak
-  // UpdateSpiderBall__10CMorphBallFRC11CFinalInputR13CStateManagerf global
+  void UpdateSpiderBall(const CFinalInput&, CStateManager&, float);
+  void ResetSpiderBallForces();
   // CheckForSwitchToSpiderBallSwinging__10CMorphBallCFR13CStateManager global
   // FindClosestSpiderBallWaypoint__10CMorphBallCFR13CStateManagerRC9CVector3fR9CVector3fR9CVector3fR9CVector3fRfR9CVector3fRbR12CTransform4f global
   // SetSpiderBallSwingingState__10CMorphBallFb global
@@ -128,9 +130,8 @@ public:
   // CalculateSpiderBallAttractionSurfaceForces__10CMorphBallCFRC11CFinalInputR13CStateManagerRC12CTransform4f global
   float ForwardInput(const CFinalInput&) const;
   float BallTurnInput(const CFinalInput&) const;
-  // ComputeMaxSpeed__10CMorphBallCFv global
-  // GetTouchedHalfPipeRecently__10CMorphBallCFv global
-  // ComputeLiftForces__10CMorphBallFRC9CVector3fRC9CVector3fRC13CStateManager global
+  float ComputeMaxSpeed() const;
+  void ComputeLiftForces(const CVector3f& control_force, const CVector3f& velocity, const CStateManager& mgr);
   void UpdateBallDynamics(CStateManager&, float);
   bool BallCloseToCollision(const CStateManager& mgr, float dist, const CMaterialFilter& filter) const;
   // UpdateHalfPipeStatus__10CMorphBallFR13CStateManagerf global

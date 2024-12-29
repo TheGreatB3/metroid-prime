@@ -371,6 +371,8 @@ public:
   EGunHolsterState GetGunHolsterState() const { return x498_gunHolsterState; }
   NPlayer::EPlayerMovementState GetPlayerMovementState() const { return x258_movementState; }
   const CVector3f& GetAssistedTargetAim() const { return x480_assistedTargetAim; }
+  const CVector3f& GetControlDir() const { return x540_controlDir; }
+  const CVector3f& GetControlDirFlat() const { return x54c_controlDirFlat; }
   // CPlayer::GetFlipSpiderBallControlY() const weak
   // CPlayer::GetFlipSpiderBallControlX() const weak
 
