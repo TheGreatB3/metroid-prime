@@ -8,6 +8,7 @@
 #include <MetroidPrime/CActorLights.hpp>
 #include <MetroidPrime/CAnimData.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
+#include <MetroidPrime/CDamageInfo.hpp>
 #include <MetroidPrime/CGameCollision.hpp>
 #include <MetroidPrime/CGameLight.hpp>
 #include <MetroidPrime/CRainSplashGenerator.hpp>
@@ -199,6 +200,23 @@ bool CMorphBall::IsInFrustum(const CFrustumPlanes& frustum) const {
 }
 
 float CMorphBall::GetBallTouchRadius() const { return gpTweakBall->GetBallTouchRadius(); }
+
+// NON_MATCHING
+void CMorphBall::Touch(CActor& actor, CStateManager& mgr) {
+  CPhysicsActor* act = TCastToPtr< CPhysicsActor >(actor);
+  if (act->GetCurrentAreaId() != 0 && IsBoosting()) {
+    CVector3f relative_velocity = act->GetVelocityWR() - x0_player.GetVelocityWR();
+    float relative_speed = relative_velocity.Magnitude();
+    if (relative_speed > gpTweakBall->GetBoostBallMinRelativeSpeedForDamage()) {
+      static CDamageInfo damage_info(CWeaponMode::BoostBall(), 50000.0f, 50000.0f, 0.0f, 0.0f,
+                                     true);
+      CMaterialFilter material_filter =
+          CMaterialFilter::MakeIncludeExclude(CMaterialList(kMT_Player), CMaterialList());
+      mgr.ApplyDamage(x0_player.GetUniqueId(), actor.GetUniqueId(), x0_player.GetUniqueId(),
+                      damage_info, material_filter, CVector3f::Zero());
+    }
+  }
+}
 
 // NON_MATCHING
 void CMorphBall::AcceptScriptMsg(EScriptObjectMessage msg, TUniqueId id, CStateManager& mgr) {
