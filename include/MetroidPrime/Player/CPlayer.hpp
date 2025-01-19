@@ -279,7 +279,7 @@ public:
   void UpdateFreeLookState(const CFinalInput& input, float dt, CStateManager& mgr);
   void UpdateCameraTimers(float dt, const CFinalInput& input);
   void UpdateSubmerged(const CStateManager& mgr);
-  bool CheckSubmerged();
+  bool CheckSubmerged() const;
   void SetMoveState(NPlayer::EPlayerMovementState state, CStateManager& mgr);
   void StartLandingControlFreeze(); // name?
   void EndLandingControlFreeze();   // name?
