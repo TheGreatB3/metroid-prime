@@ -343,6 +343,7 @@ public:
   void UpdateOrbitOrientation(CStateManager& mgr);
   bool IsTransparent() const;
   float GetDeathTime() const { return x9f4_deathTime; }
+  const CVector3f& GetLastVelocity() const { return x794_lastVelocity; }
 
   CPlayerGun* PlayerGun() { return x490_gun.get(); }
   const CPlayerGun* GetPlayerGun() const { return x490_gun.get(); }

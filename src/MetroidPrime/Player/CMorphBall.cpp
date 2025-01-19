@@ -614,3 +614,14 @@ void CMorphBall::ApplyGravity(CStateManager& mgr) {
         CVector3f(0.0f, 0.0f, x0_player.GetMass() * gpTweakBall->GetBallGravity()));
   }
 }
+
+void CMorphBall::Land() {
+  if (x0_player.GetVelocityWR().GetZ() < -5.0f) {
+    if (x1e36_landSfx != 0xFFFF /* Invalid SFX ID */) {
+      uchar land_vol = CCast::ToUint8(
+          CMath::Clamp(95.0f, x0_player.GetLastVelocity().GetZ() * 1.6f + 95.0f, 127.0f));
+      // This same operation is done in CPlayer::AcceptScriptMsg.
+      x0_player.DoSfxEffects(CSfxManager::SfxStart(x1e36_landSfx, land_vol, 64, true));
+    }
+  }
+}
