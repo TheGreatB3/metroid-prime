@@ -590,3 +590,16 @@ void CMorphBall::ComputeLiftForces(const CVector3f& control_force, const CVector
     }
   }
 }
+
+void CMorphBall::ApplyFriction(float friction) {
+  CVector3f vel = x0_player.GetVelocityWR();
+  if (friction < vel.Magnitude()) {
+    float adjusted_speed = vel.Magnitude() - friction;
+    CVector3f direction = vel.AsNormalized();
+    vel = adjusted_speed * direction;
+  } else {
+    vel = CVector3f::Zero();
+  }
+
+  x0_player.SetVelocityWR(vel);
+}

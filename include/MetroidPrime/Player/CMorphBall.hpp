@@ -141,7 +141,7 @@ public:
   // GetMinimumAlignmentSpeed__10CMorphBallCFv global
   // CalculateBallContactInfo__10CMorphBallCFR9CVector3fR9CVector3f global
   // CalculateSurfaceFriction__10CMorphBallCFv global
-  // ApplyFriction__10CMorphBallFf global
+  void ApplyFriction(float friction);
   // ApplyGravity__10CMorphBallFR13CStateManager global
   void Land();
   void ResetMorphBallIceBreak();
