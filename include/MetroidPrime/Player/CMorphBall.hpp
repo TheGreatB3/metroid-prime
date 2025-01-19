@@ -142,7 +142,7 @@ public:
   // CalculateBallContactInfo__10CMorphBallCFR9CVector3fR9CVector3f global
   // CalculateSurfaceFriction__10CMorphBallCFv global
   void ApplyFriction(float friction);
-  // ApplyGravity__10CMorphBallFR13CStateManager global
+  void ApplyGravity(CStateManager& mgr);
   void Land();
   void ResetMorphBallIceBreak();
   void StopParticleWakes();

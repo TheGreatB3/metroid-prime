@@ -603,3 +603,14 @@ void CMorphBall::ApplyFriction(float friction) {
 
   x0_player.SetVelocityWR(vel);
 }
+
+void CMorphBall::ApplyGravity(CStateManager& mgr) {
+  if (x0_player.CheckSubmerged() &&
+      !mgr.GetPlayerState()->HasPowerUp(CPlayerState::kIT_GravitySuit)) {
+    x0_player.SetMomentumWR(
+        CVector3f(0.0f, 0.0f, x0_player.GetMass() * gpTweakBall->GetBallWaterGravity()));
+  } else {
+    x0_player.SetMomentumWR(
+        CVector3f(0.0f, 0.0f, x0_player.GetMass() * gpTweakBall->GetBallGravity()));
+  }
+}
