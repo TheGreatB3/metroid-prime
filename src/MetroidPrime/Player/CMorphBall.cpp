@@ -591,6 +591,13 @@ void CMorphBall::ComputeLiftForces(const CVector3f& control_force, const CVector
   }
 }
 
+void CMorphBall::SpinToSpeed(float speed, const CVector3f& direction, float t) {
+  CVector3f angular_vel = x0_player.GetAngularVelocityWR().GetVector();
+  float scale = t * (speed - angular_vel.Magnitude());
+  CVector3f torque = direction * scale;
+  x0_player.ApplyTorqueWR(torque);
+}
+
 void CMorphBall::ApplyFriction(float friction) {
   CVector3f vel = x0_player.GetVelocityWR();
   if (friction < vel.Magnitude()) {

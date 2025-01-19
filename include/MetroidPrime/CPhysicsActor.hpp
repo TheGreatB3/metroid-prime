@@ -122,6 +122,7 @@ public:
   const CVector3f& GetVelocityWR() const { return x138_velocity; }
   const CVector3f& GetMomentumWR() const { return x150_momentum; }
   void SetMomentumWR(const CVector3f& momentum) { x150_momentum = momentum; }
+  const CAxisAngle& GetAngularVelocityWR() const { return x144_angularVelocity; }
   const CVector3f& GetForceWR() const { return x15c_force; }
   void SetForceWR(const CVector3f& force) { x15c_force = force; }
   const CVector3f& GetImpulseWR() const { return x168_impulse; }

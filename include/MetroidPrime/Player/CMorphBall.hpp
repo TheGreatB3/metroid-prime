@@ -137,7 +137,7 @@ public:
   // UpdateHalfPipeStatus__10CMorphBallFR13CStateManagerf global
   // CalculateSurfaceToWorld__10CMorphBallCFRC9CVector3fRC9CVector3fRC9CVector3f global
   // UpdateMarbleDynamics__10CMorphBallFR13CStateManagerfRC9CVector3f global
-  // SpinToSpeed__10CMorphBallFfRC9CVector3ff global
+  void SpinToSpeed(float speed, const CVector3f& direction, float t);
   // GetMinimumAlignmentSpeed__10CMorphBallCFv global
   // CalculateBallContactInfo__10CMorphBallCFR9CVector3fR9CVector3f global
   // CalculateSurfaceFriction__10CMorphBallCFv global
