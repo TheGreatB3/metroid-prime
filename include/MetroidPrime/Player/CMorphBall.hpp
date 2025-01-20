@@ -60,7 +60,6 @@ public:
   bool IsProjectile() const { return x1954_isProjectile; }
   // LeaveBoosting__10CMorphBallFv global
   void LeaveBoosting();
-  // CancelBoosting__10CMorphBallFv global
   void CancelBoosting();
   // InSpiderMode__10CMorphBallCFv weak
   void SetAsProjectile();

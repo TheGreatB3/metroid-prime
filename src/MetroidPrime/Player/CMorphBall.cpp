@@ -181,6 +181,18 @@ void CMorphBall::TakeDamage(float damage) {
   x1e44_damageEffect = 1.0f;
 }
 
+// NON_MATCHING: Nearly matching, one instruction off.
+void CMorphBall::CancelBoosting() {
+  x1de8_boostChargeTime = 0.0f;
+  x1df4_boostDrainTime = 0.0f;
+
+  if (x1e20_ballAnimIdx == 1) { // needs to be cmpwi instruction, but is actually cmplwi.
+    x58_ballModel->AnimationData()->SetAnimation(CAnimPlaybackParms(0, -1, 1.0f, true), false);
+    x1e20_ballAnimIdx = 0;
+    CSfxManager::SfxStop(x1e24_boostSfxHandle);
+  }
+}
+
 void CMorphBall::SetAsProjectile() { x1954_isProjectile = true; }
 
 // NON_MATCHING
