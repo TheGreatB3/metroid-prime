@@ -58,7 +58,6 @@ public:
   float GetBallRadius() const;
   void TakeDamage(float damage);
   bool IsProjectile() const { return x1954_isProjectile; }
-  // LeaveBoosting__10CMorphBallFv global
   void LeaveBoosting();
   void CancelBoosting();
   // InSpiderMode__10CMorphBallCFv weak

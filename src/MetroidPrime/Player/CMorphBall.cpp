@@ -181,6 +181,16 @@ void CMorphBall::TakeDamage(float damage) {
   x1e44_damageEffect = 1.0f;
 }
 
+void CMorphBall::LeaveBoosting() {
+  if (IsBoosting()) {
+    x1dec_timeNotInBoost = 0.0f;
+    x1de8_boostChargeTime = 0.0f;
+  }
+
+  x1de4_24_inBoost = false;
+  x1df4_boostDrainTime = 0.0f;
+}
+
 // NON_MATCHING: Nearly matching, one instruction off.
 void CMorphBall::CancelBoosting() {
   x1de8_boostChargeTime = 0.0f;
