@@ -140,7 +140,7 @@ public:
   void SpinToSpeed(float speed, const CVector3f& direction, float t);
   // GetMinimumAlignmentSpeed__10CMorphBallCFv global
   // CalculateBallContactInfo__10CMorphBallCFR9CVector3fR9CVector3f global
-  // CalculateSurfaceFriction__10CMorphBallCFv global
+  float CalculateSurfaceFriction() const;
   void ApplyFriction(float friction);
   void ApplyGravity(CStateManager& mgr);
   void Land();

@@ -389,8 +389,12 @@ public:
   float GetAverageSpeed() const;
   float GetGravity() const;
 
+  TUniqueId GetAttachedActor() const { return x26c_attachedActor; }
+
   float GetAttachedActorStruggle() const;
   void SetAttachedActorStruggle(float struggle) { xa28_attachedActorStruggle = struggle; }
+
+  const CPlayerEnergyDrain& GetEnergyDrain() const { return x274_energyDrain; }
 
   // PlayerHint
   // bool SetAreaPlayerHint(const CScriptPlayerHint& hint, CStateManager& mgr);

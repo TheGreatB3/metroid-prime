@@ -598,6 +598,21 @@ void CMorphBall::SpinToSpeed(float speed, const CVector3f& direction, float t) {
   x0_player.ApplyTorqueWR(torque);
 }
 
+float CMorphBall::CalculateSurfaceFriction() const {
+  float friction = gpTweakBall->GetBallTranslationFriction(x0_player.GetSurfaceRestraint());
+
+  if (x0_player.GetAttachedActor() != kInvalidUniqueId) {
+    friction *= 2.0f;
+  }
+
+  // Do something funky with energy drain. This doesn't make much sense, but it matches.
+  if (x0_player.GetEnergyDrain().GetEnergyDrainSources().size() > 0) {
+    friction *= x0_player.GetEnergyDrain().GetEnergyDrainSources().size() * 1.5f;
+  }
+
+  return friction;
+}
+
 void CMorphBall::ApplyFriction(float friction) {
   CVector3f vel = x0_player.GetVelocityWR();
   if (friction < vel.Magnitude()) {
