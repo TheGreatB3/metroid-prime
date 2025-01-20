@@ -15,6 +15,7 @@
 #include <MetroidPrime/CWorldShadow.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
+#include <rstl/math.hpp>
 
 // NON_MATCHING
 CMorphBall::CMorphBall(CPlayer& player, float radius)
@@ -545,6 +546,13 @@ float CMorphBall::BallTurnInput(const CFinalInput& input) const {
   float right = ControlMapper::GetAnalogInput(ControlMapper::kC_TurnRight, input);
   float movement = left - right;
   return movement;
+}
+
+// NON_MATCHING: Some register differences.
+float CMorphBall::ComputeMaxSpeed() const {
+  return GetIsInHalfPipeMode()
+             ? rstl::min_val(95.0f, x0_player.GetVelocityWR().Magnitude() * 1.5f)
+             : gpTweakBall->GetBallTranslationMaxSpeed(x0_player.GetSurfaceRestraint());
 }
 
 // NON_MATCHING
