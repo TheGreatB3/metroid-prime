@@ -529,26 +529,25 @@ void CMorphBall::ComputeMarioMovement(const CFinalInput& input, CStateManager& m
   }
 }
 
-// NON_MATCHING
 float CMorphBall::ForwardInput(const CFinalInput& input) const {
   if (!IsMovementAllowed())
-    return 0.0f; // Not matching here. Loading something from lbl_805AAE70.
+    return 0.0f;
   float forward = ControlMapper::GetAnalogInput(ControlMapper::kC_Forward, input);
   float backward = ControlMapper::GetAnalogInput(ControlMapper::kC_Backward, input);
   float movement = forward - backward;
   return movement;
 }
 
-// NON_MATCHING
 float CMorphBall::BallTurnInput(const CFinalInput& input) const {
   if (!IsMovementAllowed())
-    return 0.0f; // Not matching here. Loading something from lbl_805AAE70.
+    return 0.0f;
   float left = ControlMapper::GetAnalogInput(ControlMapper::kC_TurnLeft, input);
   float right = ControlMapper::GetAnalogInput(ControlMapper::kC_TurnRight, input);
   float movement = left - right;
   return movement;
 }
 
+// NON_MATCHING
 void CMorphBall::ComputeLiftForces(const CVector3f& control_force, const CVector3f& velocity,
                                    const CStateManager& mgr) {
   float speed = velocity.Magnitude();
