@@ -116,10 +116,10 @@ public:
   // SetSpiderBallState__10CMorphBallFQ210CMorphBall16ESpiderBallState weak
   void UpdateSpiderBall(const CFinalInput&, CStateManager&, float);
   void ResetSpiderBallForces();
-  // CheckForSwitchToSpiderBallSwinging__10CMorphBallCFR13CStateManager global
+  bool CheckForSwitchToSpiderBallSwinging(CStateManager& mgr);
   // FindClosestSpiderBallWaypoint__10CMorphBallCFR13CStateManagerRC9CVector3fR9CVector3fR9CVector3fR9CVector3fRfR9CVector3fRbR12CTransform4f global
-  // SetSpiderBallSwingingState__10CMorphBallFb global
-  // ResetSpiderBallSwingControllerMovementTimer__10CMorphBallFv global
+  void SetSpiderBallSwingingState(bool val);
+  void ResetSpiderBallSwingControllerMovementTimer();
   // ApplySpiderBallSwingingForces__10CMorphBallFRC11CFinalInputR13CStateManagerf global
   // GetSpiderBallControllerMovement__10CMorphBallCFRC11CFinalInputbb global
   // UpdateSpiderBallSwingControllerMovementTimer__10CMorphBallFff global

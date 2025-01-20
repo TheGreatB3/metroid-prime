@@ -552,6 +552,20 @@ void CMorphBall::ComputeMarioMovement(const CFinalInput& input, CStateManager& m
   }
 }
 
+void CMorphBall::SetSpiderBallSwingingState(bool val) {
+  if (x18be_spiderBallSwinging != val) {
+    ResetSpiderBallSwingControllerMovementTimer();
+    x18bf_spiderSwingInAir = true;
+  }
+
+  x18be_spiderBallSwinging = val;
+}
+
+void CMorphBall::ResetSpiderBallSwingControllerMovementTimer() {
+  x1904_swingControlDir = 0.0f;
+  x1908_swingControlTime = 0.0f;
+}
+
 float CMorphBall::ForwardInput(const CFinalInput& input) const {
   if (!IsMovementAllowed())
     return 0.0f;
