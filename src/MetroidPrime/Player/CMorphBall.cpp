@@ -552,6 +552,53 @@ void CMorphBall::ComputeMarioMovement(const CFinalInput& input, CStateManager& m
   }
 }
 
+void CMorphBall::UpdateSpiderBall(const CFinalInput& input, CStateManager& mgr, float dt) {
+  SetSpiderBallSwingingState(CheckForSwitchToSpiderBallSwinging(mgr));
+
+  if (x18be_spiderBallSwinging) {
+    ApplySpiderBallSwingingForces(input, mgr, dt);
+  } else {
+    ApplySpiderBallRollForces(input, mgr, dt);
+  }
+}
+
+bool CMorphBall::CheckForSwitchToSpiderBallSwinging(CStateManager& mgr) const {
+  if (!x18bd_touchingSpider) {
+    return false;
+  }
+  if (x188c_spiderPullMovement == 1.0f) {
+    if (x18be_spiderBallSwinging) {
+      CVector3f closest_point = CVector3f::Zero();
+      CVector3f interp_delta_between_points = CVector3f::Zero();
+      CVector3f delta_between_points = CVector3f::Zero();
+      float distance = 0.0f;
+      CVector3f normal = CVector3f::Zero();
+      bool is_surface;
+      CTransform4f surface_transform(CTransform4f::Identity());
+      if (FindClosestSpiderBallWaypoint(mgr, GetBallToWorld().GetTranslation(), closest_point,
+                                        interp_delta_between_points, delta_between_points, distance,
+                                        normal, is_surface, surface_transform) &&
+          distance < 2.1f) {
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+  if (x18be_spiderBallSwinging != false)
+    return true;
+  return CMath::AbsF(x1880_playerToSpiderNormal.GetZ()) > 0.9f;
+}
+
+bool CMorphBall::FindClosestSpiderBallWaypoint(CStateManager& mgr, const CVector3f& ballCenter,
+                                               CVector3f& closestPoint,
+                                               CVector3f& interpDeltaBetweenPoints,
+                                               CVector3f& deltaBetweenPoints, float& distance,
+                                               CVector3f& normal, bool& isSurface,
+                                               CTransform4f& surfaceXf) const {
+  // TODO
+}
+
 void CMorphBall::SetSpiderBallSwingingState(bool val) {
   if (x18be_spiderBallSwinging != val) {
     ResetSpiderBallSwingControllerMovementTimer();
@@ -564,6 +611,12 @@ void CMorphBall::SetSpiderBallSwingingState(bool val) {
 void CMorphBall::ResetSpiderBallSwingControllerMovementTimer() {
   x1904_swingControlDir = 0.0f;
   x1908_swingControlTime = 0.0f;
+}
+
+void CMorphBall::ApplySpiderBallSwingingForces(const CFinalInput& input, CStateManager& mgr,
+                                               float dt) {}
+
+void CMorphBall::ApplySpiderBallRollForces(const CFinalInput& input, CStateManager& mgr, float dt) {
 }
 
 float CMorphBall::ForwardInput(const CFinalInput& input) const {

@@ -112,19 +112,23 @@ public:
   bool IsMovementAllowed() const;
   void EnterBoosting(float);
   // SwitchToTire__10CMorphBallFv global
-  void ComputeMarioMovement(const CFinalInput&, CStateManager&, float);
+  void ComputeMarioMovement(const CFinalInput& input, CStateManager& mgr, float dt);
   // SetSpiderBallState__10CMorphBallFQ210CMorphBall16ESpiderBallState weak
-  void UpdateSpiderBall(const CFinalInput&, CStateManager&, float);
+  void UpdateSpiderBall(const CFinalInput& input, CStateManager& mgr, float dt);
   void ResetSpiderBallForces();
-  bool CheckForSwitchToSpiderBallSwinging(CStateManager& mgr);
-  // FindClosestSpiderBallWaypoint__10CMorphBallCFR13CStateManagerRC9CVector3fR9CVector3fR9CVector3fR9CVector3fRfR9CVector3fRbR12CTransform4f global
+  bool CheckForSwitchToSpiderBallSwinging(CStateManager& mgr) const;
+  bool FindClosestSpiderBallWaypoint(CStateManager& mgr, const CVector3f& ballCenter,
+                                     CVector3f& closestPoint, CVector3f& interpDeltaBetweenPoints,
+                                     CVector3f& deltaBetweenPoints, float& distance,
+                                     CVector3f& normal, bool& isSurface,
+                                     CTransform4f& surfaceXf) const;
   void SetSpiderBallSwingingState(bool val);
   void ResetSpiderBallSwingControllerMovementTimer();
-  // ApplySpiderBallSwingingForces__10CMorphBallFRC11CFinalInputR13CStateManagerf global
+  void ApplySpiderBallSwingingForces(const CFinalInput& input, CStateManager& mgr, float dt);
   // GetSpiderBallControllerMovement__10CMorphBallCFRC11CFinalInputbb global
   // UpdateSpiderBallSwingControllerMovementTimer__10CMorphBallFff global
   // GetSpiderBallSwingControllerMovementScalar__10CMorphBallCFv global
-  // ApplySpiderBallRollForces__10CMorphBallFRC11CFinalInputR13CStateManagerf global
+  void ApplySpiderBallRollForces(const CFinalInput& input, CStateManager& mgr, float dt);
   // CalculateSpiderBallAttractionSurfaceForces__10CMorphBallCFRC11CFinalInputR13CStateManagerRC12CTransform4f global
   float ForwardInput(const CFinalInput&) const;
   float BallTurnInput(const CFinalInput&) const;
