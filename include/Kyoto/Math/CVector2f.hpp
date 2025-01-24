@@ -26,6 +26,8 @@ public:
   static float GetAngleDiff(const CVector2f& a, const CVector2f& b);
   static float Dot(const CVector2f& a, const CVector2f& b);
 
+  static const CVector2f& Zero() { return skZeroVector; }
+
 private:
   float mX;
   float mY;
