@@ -697,6 +697,17 @@ void CMorphBall::ApplySpiderBallSwingingForces(const CFinalInput& input, CStateM
 void CMorphBall::ApplySpiderBallRollForces(const CFinalInput& input, CStateManager& mgr, float dt) {
 }
 
+CVector2f CMorphBall::CalculateSpiderBallAttractionSurfaceForces(const CFinalInput& input) const {
+  if (!IsMovementAllowed())
+    return CVector2f::Zero();
+
+  float front_back = ControlMapper::GetAnalogInput(ControlMapper::kC_Forward, input) -
+                     ControlMapper::GetAnalogInput(ControlMapper::kC_Backward, input);
+  float left_right = ControlMapper::GetAnalogInput(ControlMapper::kC_TurnRight, input) -
+                     ControlMapper::GetAnalogInput(ControlMapper::kC_TurnLeft, input);
+  return CVector2f(left_right, front_back);
+}
+
 float CMorphBall::ForwardInput(const CFinalInput& input) const {
   if (!IsMovementAllowed())
     return 0.0f;

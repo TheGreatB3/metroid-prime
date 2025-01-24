@@ -129,7 +129,7 @@ public:
   // UpdateSpiderBallSwingControllerMovementTimer__10CMorphBallFff global
   // GetSpiderBallSwingControllerMovementScalar__10CMorphBallCFv global
   void ApplySpiderBallRollForces(const CFinalInput& input, CStateManager& mgr, float dt);
-  // CalculateSpiderBallAttractionSurfaceForces__10CMorphBallCFRC11CFinalInputR13CStateManagerRC12CTransform4f global
+  CVector2f CalculateSpiderBallAttractionSurfaceForces(const CFinalInput& input) const;
   float ForwardInput(const CFinalInput&) const;
   float BallTurnInput(const CFinalInput&) const;
   float ComputeMaxSpeed() const;
