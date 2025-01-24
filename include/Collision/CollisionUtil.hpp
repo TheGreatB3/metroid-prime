@@ -7,6 +7,7 @@ class CAABox;
 class CMaterialList;
 class CCollisionInfoList;
 class CVector3f;
+class CPlane;
 
 namespace CollisionUtil {
 
@@ -19,6 +20,9 @@ bool AABoxAABoxIntersection(const CAABox& left, const CAABox& right);
 bool AABoxAABoxIntersection(const CAABox& left, const CMaterialList& leftFilter,
                             const CAABox& right, const CMaterialList& rightFilter,
                             CCollisionInfoList& list);
+
+bool RayPlaneIntersection(const CVector3f& from, const CVector3f& to, const CPlane& plane,
+                          CVector3f& point);
 
 } // namespace CollisionUtil
 

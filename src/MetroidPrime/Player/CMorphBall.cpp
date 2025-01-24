@@ -1,6 +1,7 @@
 #include "MetroidPrime/Player/CMorphBall.hpp"
 
 #include <Collision/CRayCastResult.hpp>
+#include <Collision/CollisionUtil.hpp>
 #include <Kyoto/Audio/CSfxManager.hpp>
 #include <Kyoto/CResFactory.hpp>
 #include <Kyoto/Particles/CElementGen.hpp>
@@ -13,6 +14,8 @@
 #include <MetroidPrime/CGameLight.hpp>
 #include <MetroidPrime/CRainSplashGenerator.hpp>
 #include <MetroidPrime/CWorldShadow.hpp>
+#include <MetroidPrime/ScriptObjects/CScriptSpiderBallAttractionSurface.hpp>
+#include <MetroidPrime/ScriptObjects/CScriptSpiderBallWaypoint.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
 #include <rstl/math.hpp>
@@ -590,13 +593,88 @@ bool CMorphBall::CheckForSwitchToSpiderBallSwinging(CStateManager& mgr) const {
   return CMath::AbsF(x1880_playerToSpiderNormal.GetZ()) > 0.9f;
 }
 
+// NON_MATCHING
 bool CMorphBall::FindClosestSpiderBallWaypoint(CStateManager& mgr, const CVector3f& ballCenter,
                                                CVector3f& closestPoint,
                                                CVector3f& interpDeltaBetweenPoints,
                                                CVector3f& deltaBetweenPoints, float& distance,
                                                CVector3f& normal, bool& isSurface,
                                                CTransform4f& surfaceXf) const {
-  // TODO
+  float minDist = 2.1f;
+  bool result = false;
+  CVector3f box_max = ballCenter + CVector3f(2.1f, 2.1f, 2.1f);
+  CVector3f box_min = ballCenter - CVector3f(2.1f, 2.1f, 2.1f);
+  CAABox box(box_min, box_max);
+  TEntityList nearList;
+  mgr.BuildNearList(nearList, box, CMaterialFilter::GetPassEverything(), nullptr);
+
+  // Iterate through surfaces.
+  for (int i = 0; i < nearList.size(); i++) {
+    if (const CScriptSpiderBallAttractionSurface* surface =
+            TCastToConstPtr< CScriptSpiderBallAttractionSurface >(mgr.GetObjectById(nearList[i]))) {
+      CVector3f surface_point = surface->GetTransform().GetColumn(kDY);
+      CVector3f surface_normal = surface_point.AsNormalized();
+      CUnitVector3f unit_vector(surface_normal);
+      CPlane plane(surface->GetTransform().GetTranslation() + unit_vector, unit_vector);
+      CVector3f point = CVector3f::Zero();
+      if (CollisionUtil::RayPlaneIntersection(ballCenter + surface_normal * 2.1f,
+                                              ballCenter - surface_normal * 2.1f, plane, point)) {
+        CTransform4f inv_scale = CTransform4f::Scale(1.0f / (surface->GetScale().GetX() * 0.5f),
+                                                     1.0f / (surface->GetScale().GetY() * 0.5f),
+                                                     1.0f / (surface->GetScale().GetZ() * 0.5f));
+        CVector3f transformed_point = inv_scale * surface->GetTransform().GetQuickInverse() * point;
+        transformed_point.SetX(CMath::Clamp(-1.0f, transformed_point.GetX(), 1.0f));
+        transformed_point.SetZ(CMath::Clamp(-1.0f, transformed_point.GetZ(), 1.0f));
+        CTransform4f scale = CTransform4f::Scale(surface->GetScale().GetX() * 0.5f,
+                                                 surface->GetScale().GetY() * 0.5f,
+                                                 surface->GetScale().GetZ() * 0.5f);
+        CVector3f worldPoint = surface->GetTransform() * scale * transformed_point;
+        CVector3f ballToPoint = worldPoint - ballCenter;
+
+        float mag = ballToPoint.Magnitude();
+        if (mag < minDist) {
+          minDist = mag;
+          closestPoint = ballToPoint;
+          distance = mag;
+          normal = -1.0f / mag * ballToPoint;
+          isSurface = true;
+          surfaceXf = surface->GetTransform();
+          result = true;
+        }
+      }
+    }
+  }
+
+  // Iterate through waypoints.
+  for (int i = 0; i < nearList.size(); i++) {
+    if (const CScriptSpiderBallWaypoint* waypoint =
+            TCastToConstPtr< CScriptSpiderBallWaypoint >(mgr.GetObjectById(nearList[i]))) {
+      CVector3f worldPoint = CVector3f::Zero();
+      const CScriptSpiderBallWaypoint* closestWP = nullptr;
+      CVector3f useInterpDeltaBetweenPoints = interpDeltaBetweenPoints;
+      CVector3f useDeltaBetweenPoints = deltaBetweenPoints;
+      waypoint->GetClosestPointAlongWaypoints(mgr, ballCenter, 2.1f, &closestWP, worldPoint,
+                                              useDeltaBetweenPoints, 0.8f,
+                                              useInterpDeltaBetweenPoints);
+      if (closestWP != nullptr) {
+        CVector3f ballToPoint = worldPoint - ballCenter;
+
+        float mag = ballToPoint.Magnitude();
+        if (mag < minDist) {
+          result = true;
+          closestPoint = ballToPoint;
+          interpDeltaBetweenPoints = useInterpDeltaBetweenPoints;
+          deltaBetweenPoints = useDeltaBetweenPoints;
+          minDist = mag;
+          distance = minDist;
+          normal = -1.0f / mag * ballToPoint;
+          isSurface = false;
+        }
+      }
+    }
+  }
+
+  return result;
 }
 
 void CMorphBall::SetSpiderBallSwingingState(bool val) {
