@@ -694,6 +694,15 @@ void CMorphBall::ResetSpiderBallSwingControllerMovementTimer() {
 void CMorphBall::ApplySpiderBallSwingingForces(const CFinalInput& input, CStateManager& mgr,
                                                float dt) {}
 
+// NON_MATCHING
+float CMorphBall::GetSpiderBallSwingControllerMovementScalar() const {
+  if (x1908_swingControlTime < 1.2) {
+    return 1.0f;
+  }
+
+  return rstl::max_val(0.0f, (2.4f - x1908_swingControlTime) / 1.2f);
+}
+
 void CMorphBall::ApplySpiderBallRollForces(const CFinalInput& input, CStateManager& mgr, float dt) {
 }
 
