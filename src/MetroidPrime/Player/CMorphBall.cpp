@@ -694,6 +694,19 @@ void CMorphBall::ResetSpiderBallSwingControllerMovementTimer() {
 void CMorphBall::ApplySpiderBallSwingingForces(const CFinalInput& input, CStateManager& mgr,
                                                float dt) {}
 
+void CMorphBall::UpdateSpiderBallSwingControllerMovementTimer(float movement, float dt) {
+  if (CMath::AbsF(movement) < 0.05f) {
+    ResetSpiderBallSwingControllerMovementTimer();
+  } else {
+    if (x1904_swingControlDir != CMath::Sign(movement)) {
+      ResetSpiderBallSwingControllerMovementTimer();
+      x1904_swingControlDir = CMath::Sign(movement);
+    } else {
+      x1908_swingControlTime += dt;
+    }
+  }
+}
+
 // NON_MATCHING
 float CMorphBall::GetSpiderBallSwingControllerMovementScalar() const {
   if (x1908_swingControlTime < 1.2) {

@@ -126,7 +126,7 @@ public:
   void ResetSpiderBallSwingControllerMovementTimer();
   void ApplySpiderBallSwingingForces(const CFinalInput& input, CStateManager& mgr, float dt);
   // GetSpiderBallControllerMovement__10CMorphBallCFRC11CFinalInputbb global
-  // UpdateSpiderBallSwingControllerMovementTimer__10CMorphBallFff global
+  void UpdateSpiderBallSwingControllerMovementTimer(float movement, float dt);
   float GetSpiderBallSwingControllerMovementScalar() const;
   void ApplySpiderBallRollForces(const CFinalInput& input, CStateManager& mgr, float dt);
   CVector2f CalculateSpiderBallAttractionSurfaceForces(const CFinalInput& input) const;
