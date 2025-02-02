@@ -396,6 +396,10 @@ public:
 
   const CPlayerEnergyDrain& GetEnergyDrain() const { return x274_energyDrain; }
 
+  float GetFlatMoveSpeed() const { return x4fc_flatMoveSpeed; }
+
+  float GetBallMaxVelocity() const;
+
   // PlayerHint
   // bool SetAreaPlayerHint(const CScriptPlayerHint& hint, CStateManager& mgr);
   void AddToPlayerHintRemoveList(TUniqueId id, CStateManager& mgr);

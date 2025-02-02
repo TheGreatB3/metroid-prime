@@ -10,12 +10,15 @@
 #include <MetroidPrime/CAnimData.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
 #include <MetroidPrime/CDamageInfo.hpp>
+#include <MetroidPrime/CFluidPlaneCPU.hpp>
+#include <MetroidPrime/CFluidPlaneManager.hpp>
 #include <MetroidPrime/CGameCollision.hpp>
 #include <MetroidPrime/CGameLight.hpp>
 #include <MetroidPrime/CRainSplashGenerator.hpp>
 #include <MetroidPrime/CWorldShadow.hpp>
 #include <MetroidPrime/ScriptObjects/CScriptSpiderBallAttractionSurface.hpp>
 #include <MetroidPrime/ScriptObjects/CScriptSpiderBallWaypoint.hpp>
+#include <MetroidPrime/ScriptObjects/CScriptWater.hpp>
 #include <MetroidPrime/Tweaks/CTweakBall.hpp>
 #include <MetroidPrime/Tweaks/CTweakPlayer.hpp>
 #include <rstl/math.hpp>
@@ -207,6 +210,39 @@ void CMorphBall::CancelBoosting() {
 }
 
 void CMorphBall::SetAsProjectile() { x1954_isProjectile = true; }
+
+void CMorphBall::FluidFXThink(CActor::EFluidState state, CScriptWater& water, CStateManager& mgr) {
+  const float flat_move_speed = x0_player.GetFlatMoveSpeed();
+  CVector3f position(x0_player.GetTranslation().GetX(), x0_player.GetTranslation().GetY(),
+                     water.GetTriggerBoundsWR().GetMaxPoint().GetZ());
+
+  if (flat_move_speed >= 8.0f) {
+    float max_vel = x0_player.GetBallMaxVelocity();
+    float last_splash = mgr.GetFluidPlaneManager()->GetLastSplashDeltaTime(x0_player.GetUniqueId());
+    if (last_splash >= (max_vel - flat_move_speed) / (max_vel - 8.0f) * 0.1f) {
+      mgr.FluidPlaneManager()->CreateSplash(x0_player.GetUniqueId(), mgr, water, position, 0.0f,
+                                            state == CActor::kFS_EnteredFluid);
+    }
+  }
+
+  if (flat_move_speed >= 2.0f) {
+    float last_ripple = mgr.GetFluidPlaneManager()->GetLastRippleDeltaTime(x0_player.GetUniqueId());
+
+    float fvar;
+    if (flat_move_speed <= 15.0f) {
+      fvar = 0.13f;
+    } else {
+      fvar = rstl::max_val(0.1f, 0.13f - (flat_move_speed - 15.0f) * 0.03f /
+                                             (x0_player.GetBallMaxVelocity() - flat_move_speed));
+    }
+
+    if (last_ripple >= fvar) {
+      float max_vel = x0_player.GetBallMaxVelocity();
+      water.FluidPlane().AddRipple(flat_move_speed * 0.65f / max_vel, x0_player.GetUniqueId(),
+                                   position, water, mgr);
+    }
+  }
+}
 
 // NON_MATCHING
 bool CMorphBall::IsInFrustum(const CFrustumPlanes& frustum) const {
