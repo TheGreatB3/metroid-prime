@@ -933,6 +933,10 @@ void CPlayer::UpdatePlayerSounds(float dt) {
   }
 }
 
+float CPlayer::GetBallMaxVelocity() const {
+  return gpTweakBall->GetBallTranslationMaxSpeed(GetSurfaceRestraint());
+}
+
 int CPlayer::SfxIdFromMaterial(const CMaterialList& mat, const ushort* idList, int tableLen,
                                ushort defId) {
   int id = defId;
