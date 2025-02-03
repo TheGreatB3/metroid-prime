@@ -4,17 +4,20 @@
 #include <Collision/CollisionUtil.hpp>
 #include <Kyoto/Audio/CSfxManager.hpp>
 #include <Kyoto/CResFactory.hpp>
+#include <Kyoto/Math/CRelAngle.hpp>
 #include <Kyoto/Particles/CElementGen.hpp>
 #include <Kyoto/Particles/CParticleSwoosh.hpp>
 #include <MetroidPrime/CActorLights.hpp>
 #include <MetroidPrime/CAnimData.hpp>
 #include <MetroidPrime/CControlMapper.hpp>
 #include <MetroidPrime/CDamageInfo.hpp>
+#include <MetroidPrime/CEnvFxManager.hpp>
 #include <MetroidPrime/CFluidPlaneCPU.hpp>
 #include <MetroidPrime/CFluidPlaneManager.hpp>
 #include <MetroidPrime/CGameCollision.hpp>
 #include <MetroidPrime/CGameLight.hpp>
 #include <MetroidPrime/CRainSplashGenerator.hpp>
+#include <MetroidPrime/CWorld.hpp>
 #include <MetroidPrime/CWorldShadow.hpp>
 #include <MetroidPrime/ScriptObjects/CScriptSpiderBallAttractionSurface.hpp>
 #include <MetroidPrime/ScriptObjects/CScriptSpiderBallWaypoint.hpp>
@@ -158,6 +161,205 @@ void CMorphBall::Update(float dt, CStateManager& mgr) {
   }
 
   UpdateMorphBallSound(dt);
+}
+
+// NON_MATCHING
+void CMorphBall::UpdateEffects(float dt, CStateManager& mgr) {
+  const CTransform4f swoosh_to_world(GetSwooshToWorld());
+
+  // TODO: Make a function for these. It'll probably go in CParticleSwoosh.hpp.
+  {
+    CVector3f rotated = swoosh_to_world.Rotate(CVector3f(0.1f, 0.0f, 0.0f));
+    CVector3f swoosh_pos = swoosh_to_world.GetTranslation() + rotated;
+    x19b8_slowBlueTailSwooshGen->SetTranslation(swoosh_pos);
+    x19b8_slowBlueTailSwooshGen->SetOrientation(swoosh_to_world.GetRotation());
+    x19b8_slowBlueTailSwooshGen->SetDirty(true);
+    x19b8_slowBlueTailSwooshGen->Update(0.0);
+  }
+
+  {
+    CVector3f rotated = swoosh_to_world.Rotate(CVector3f(-0.1f, 0.0f, 0.0f));
+    CVector3f swoosh_pos = swoosh_to_world.GetTranslation() + rotated;
+    x19bc_slowBlueTailSwooshGen2->SetTranslation(swoosh_pos);
+    x19bc_slowBlueTailSwooshGen2->SetOrientation(swoosh_to_world.GetRotation());
+    x19bc_slowBlueTailSwooshGen2->SetDirty(true);
+    x19bc_slowBlueTailSwooshGen2->Update(0.0);
+  }
+
+  {
+    CVector3f rotated = swoosh_to_world.Rotate(CVector3f(0.0f, 0.0f, 0.65f));
+    CVector3f swoosh_pos = swoosh_to_world.GetTranslation() + rotated;
+    x19c0_slowBlueTailSwoosh2Gen->SetTranslation(swoosh_pos);
+    x19c0_slowBlueTailSwoosh2Gen->SetOrientation(swoosh_to_world.GetRotation());
+    x19c0_slowBlueTailSwoosh2Gen->SetDirty(true);
+    x19c0_slowBlueTailSwoosh2Gen->Update(0.0);
+  }
+
+  {
+    CVector3f rotated = swoosh_to_world.Rotate(CVector3f(0.0f, 0.0f, -0.65f));
+    CVector3f swoosh_pos = swoosh_to_world.GetTranslation() + rotated;
+    x19c4_slowBlueTailSwoosh2Gen2->SetTranslation(swoosh_pos);
+    x19c4_slowBlueTailSwoosh2Gen2->SetOrientation(swoosh_to_world.GetRotation());
+    x19c4_slowBlueTailSwoosh2Gen2->SetDirty(true);
+    x19c4_slowBlueTailSwoosh2Gen2->Update(0.0);
+  }
+
+  {
+    x19c8_jaggyTrailGen->SetTranslation(swoosh_to_world.GetTranslation());
+    x19c8_jaggyTrailGen->SetOrientation(swoosh_to_world.GetRotation());
+    x19c8_jaggyTrailGen->SetDirty(true);
+    x19c8_jaggyTrailGen->Update(0.0);
+  }
+
+  x19cc_wallSparkGen->Update(dt);
+
+  x1bc8_wakeEffectGens[7]->Update(dt);
+
+  bool should_emit = x0_player.GetPlayerMovementState() == NPlayer::kMS_OnGround &&
+                     mgr.GetWorld()->GetNeededEnvFx() == kEFX_UnderwaterFlake &&
+                     mgr.GetEnvFxManager()->GetRainMagnitude() > 0.0f &&
+                     mgr.GetEnvFxManager()->IsSplashActive();
+
+  x1bc8_wakeEffectGens[7]->SetParticleEmission(should_emit);
+
+  float l438 = mgr.GetEnvFxManager()->GetRainMagnitude() * 2.0f * x0_player.GetFlatMoveSpeed() /
+               x0_player.GetBallMaxVelocity();
+  x1bc8_wakeEffectGens[7]->SetGeneratorRate(rstl::min_val(l438, 1.0f));
+
+  x1bc8_wakeEffectGens[7]->SetTranslation(x0_player.GetTranslation());
+
+  if (should_emit) {
+    CTransform4f emit_xform(CTransform4f::LookAt(
+        x0_player.GetTranslation() + x0_player.GetMovementDirection(), x0_player.GetTranslation()));
+    x1bc8_wakeEffectGens[7]->SetOrientation(emit_xform);
+  }
+
+  if (x1c0c_wakeEffectIdx != -1) {
+    x1bc8_wakeEffectGens[x1c0c_wakeEffectIdx]->Update(dt);
+  }
+
+  if (x1e38_wallSparkFrameCountdown > 0) {
+    x1e38_wallSparkFrameCountdown--;
+    if (x1e38_wallSparkFrameCountdown < 1) {
+      x19cc_wallSparkGen->SetParticleEmission(false);
+    }
+  }
+
+  x19d0_ballInnerGlowGen->SetGlobalTranslation(swoosh_to_world.GetTranslation());
+  x19d0_ballInnerGlowGen->Update(dt);
+
+  if (x1de8_boostChargeTime == 0.0f && x1df4_boostDrainTime == 0.0f) {
+    x19d8_boostBallGlowGen->SetModulationColor(CColor(0));
+  } else {
+    x19d8_boostBallGlowGen->SetGlobalTranslation(swoosh_to_world.GetTranslation());
+    const float t = x1df4_boostDrainTime == 0.0f
+                        ? x1de8_boostChargeTime / gpTweakBall->GetBoostBallMaxChargeTime()
+                        : 1.0f - x1df4_boostDrainTime / gpTweakBall->GetBoostBallDrainTime();
+
+    x19d8_boostBallGlowGen->SetModulationColor(
+        CColor::Lerp(CColor(0.0f, 0.0f, 0.0f), CColor(1.0f, 1.0f, 0.4f), t));
+    x19d8_boostBallGlowGen->Update(dt);
+  }
+
+  x19d4_spiderBallMagnetEffectGen->Update(dt);
+
+  x1c30_boostOverLightFactor -= 0.03f;
+  x1c30_boostOverLightFactor = rstl::max_val(0.0f, x1c30_boostOverLightFactor);
+  if (x1c30_boostOverLightFactor == 0.0f) {
+    x1c34_boostLightFactor -= 0.04f;
+    x1c34_boostLightFactor = rstl::max_val(0.0f, x1c34_boostLightFactor);
+  }
+
+  if (x1de4_24_inBoost) {
+    x1c30_boostOverLightFactor = 1.0f;
+    x1c34_boostLightFactor = 1.0f;
+  } else {
+    x1c34_boostLightFactor = rstl::max_val(
+        x1c34_boostLightFactor, x1de8_boostChargeTime / gpTweakBall->GetBoostBallMaxChargeTime());
+    x1c34_boostLightFactor = rstl::min_val(1.0f, x1c34_boostLightFactor);
+  }
+
+  UpdateMorphBallTransitionFlash(dt);
+  UpdateIceBreakEffect(dt);
+
+  if (x1c10_ballInnerGlowLight != kInvalidUniqueId) {
+    CGameLight* light = TCastToPtr< CGameLight >(mgr.ObjectById(x1c10_ballInnerGlowLight));
+    if (light) {
+      light->SetTranslation(swoosh_to_world.GetTranslation() +
+                            CVector3f(0.0f, 0.0f, GetBallRadius()));
+
+      CLight flash_light = light->GetLight();
+      bool has_light = false;
+      if (IsMorphBallTransitionFlashValid() &&
+          x19dc_morphBallTransitionFlashGen->SystemHasLight()) {
+        flash_light = x19dc_morphBallTransitionFlashGen->GetLight();
+        has_light = true;
+      } else {
+        if (x19d0_ballInnerGlowGen->SystemHasLight()) {
+          flash_light = x19d0_ballInnerGlowGen->GetLight();
+          has_light = true;
+        }
+      }
+
+      if (has_light) {
+        CLight the_light = flash_light;
+
+        static const uchar glow_colors[][3] = {
+            {0xc2, 0x7e, 0x10}, /* */
+            {0x66, 0xc4, 0xff}, /* */
+            {0x60, 0xff, 0x90}, /* */
+            {0x33, 0x33, 0xff}, /* */
+            {0xff, 0x80, 0x80}, /* */
+            {0x00, 0x9d, 0xb6}, /* */
+            {0xd3, 0xf1, 0x00}, /* */
+            {0x60, 0x33, 0xff}, /* */
+            {0xfb, 0x98, 0x21}, /* */
+        };
+
+        CColor glow_color(glow_colors[x8_ballGlowColorIdx][0], glow_colors[x8_ballGlowColorIdx][1],
+                          glow_colors[x8_ballGlowColorIdx][2]);
+
+        the_light.SetColor(CColor::Modulate(the_light.GetColor(), glow_color));
+
+        if (x0_player.GetMorphballTransitionState() == CPlayer::kMS_Unmorphing) {
+          float t = 0.0f == x0_player.GetMorphDuration()
+                        ? 0.0f
+                        : CMath::Clamp(
+                              0.0f, x0_player.GetMorphTime() / x0_player.GetMorphDuration(), 1.0f);
+          the_light.SetColor(CColor::Lerp(the_light.GetColor(), CColor::Black(), t));
+        } else if (x0_player.GetMorphballTransitionState() == CPlayer::kMS_Morphing) {
+          float t = 0.0f;
+          if (x0_player.GetMorphDuration() != 0.0f) {
+            t = CMath::Clamp(0.0f, x0_player.GetMorphTime() / x0_player.GetMorphDuration(), 1.0f);
+          }
+          if (t < 0.5f) {
+            the_light.SetColor(
+                CColor::Lerp(the_light.GetColor(), CColor::Black(), rstl::min_val(t * 2.0f, 1.0f)));
+          }
+        } else {
+          the_light.SetColor(
+              CColor::Lerp(the_light.GetColor(), CColor::White(), x1c34_boostLightFactor));
+        }
+
+        light->SetLight(the_light);
+        has_light = false;
+      }
+    }
+  }
+
+  if (x187c_spiderBallState == kSBS_Active) {
+    AddSpiderBallElectricalEffect();
+    AddSpiderBallElectricalEffect();
+    AddSpiderBallElectricalEffect();
+    AddSpiderBallElectricalEffect();
+    AddSpiderBallElectricalEffect();
+
+    x1c38_spiderLightFactor = rstl::min_val(1.0f, x1c38_spiderLightFactor + 0.25f);
+  } else {
+    x1c38_spiderLightFactor = rstl::min_val(1.0f, x1c38_spiderLightFactor - 0.15f);
+  }
+
+  UpdateSpiderBallElectricalEffects();
 }
 
 CTransform4f CMorphBall::GetBallToWorld() const {
@@ -330,6 +532,12 @@ void CMorphBall::LeaveMorphBallState(CStateManager& mgr) {
   CancelBoosting();
   CSfxManager::SfxStop(x1e24_boostSfxHandle);
   StopParticleWakes();
+}
+
+CTransform4f CMorphBall::GetSwooshToWorld() const {
+  return CTransform4f(
+      CTransform4f::Translate(x0_player.GetTranslation() + CVector3f(0.0f, 0.0f, GetBallRadius())) *
+      x1924_surfaceToWorld.GetRotation() * CTransform4f::RotateY(CRelAngle(x30_ballTiltAngle)));
 }
 
 bool CMorphBall::GetIsInHalfPipeMode() const { return x1df8_24_inHalfPipeMode; }

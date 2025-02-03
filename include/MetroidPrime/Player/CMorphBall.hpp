@@ -86,11 +86,12 @@ public:
   void DeleteLight(CStateManager&);
   void EnterMorphBallState(CStateManager& mgr);
   void LeaveMorphBallState(CStateManager& mgr);
-  // GetSwooshToWorld__10CMorphBallCFv global
-  // IsMorphBallTransitionFlashValid__10CMorphBallCFv global
-  // AddSpiderBallElectricalEffect__10CMorphBallFv global
-  // UpdateSpiderBallElectricalEffects__10CMorphBallFv global
-  // UpdateMorphBallTransitionFlash__10CMorphBallFf global
+  CTransform4f GetSwooshToWorld() const;
+  bool IsMorphBallTransitionFlashValid() const;
+  void UpdateMorphBallTransitionFlash(float dt);
+  void AddSpiderBallElectricalEffect();
+  void UpdateSpiderBallElectricalEffects();
+  void UpdateIceBreakEffect(float dt);
   bool GetIsInHalfPipeMode() const;
   void SetIsInHalfPipeMode(bool val);
   bool GetIsInHalfPipeModeInAir() const;

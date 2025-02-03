@@ -400,6 +400,9 @@ public:
 
   float GetBallMaxVelocity() const;
 
+  float GetMorphTime() const { return x574_morphTime; }
+  float GetMorphDuration() const { return x578_morphDuration; }
+
   // PlayerHint
   // bool SetAreaPlayerHint(const CScriptPlayerHint& hint, CStateManager& mgr);
   void AddToPlayerHintRemoveList(TUniqueId id, CStateManager& mgr);

@@ -41,6 +41,8 @@ public:
   void AddModifier(CWarp*) override;
   uint Get4CharId() const override;
 
+  void SetDirty(bool val) { x1d0_26_isDirty = val; }
+
 private:
   TCachedToken< CSwooshDescription > x1c_desc;
   uint x28_curFrame;
@@ -70,7 +72,15 @@ private:
   float x1c4_;
   float x1c8_;
   float x1cc_TSPN;
-  char x1d0_flags;
+  // char x1d0_flags;
+  bool x1d0_24_ : 1;
+  bool x1d0_25_ : 1;
+  bool x1d0_26_isDirty : 1;
+  bool x1d0_27_ : 1;
+  bool x1d0_28_ : 1;
+  bool x1d0_29_ : 1;
+  bool x1d0_30_ : 1;
+  bool x1d0_31_ : 1;
   char x1d1_flags;
   char field32_0x1d2;
   char field33_0x1d3;
